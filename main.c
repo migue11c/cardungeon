@@ -20,9 +20,10 @@ enum State{
 
 static enum State gamestate = MENU;
 
-char getch() {
+char getkey() {
 	#ifdef _WIN32
-		return _getch();
+	   char ch = _getch();
+	   return ch;
 	#else
 		struct termios oldt, newt;
 		char ch;
@@ -52,7 +53,7 @@ int main() {
 			case MENU:
 				menu();
 input:
-				switch (getch()) {
+				switch (getkey()) {
 					case '1':
 						gamestate = SCOUNDREL;
 						break;
@@ -83,11 +84,11 @@ input:
 					default:
 						goto input;
 				}
-				printf("%c\n",ch);
 				break;
 			default:
 				break;
 		}
 	}
+	printf("byebye");
 	return 0;
 }
