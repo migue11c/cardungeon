@@ -38,6 +38,9 @@ char getch() {
 
 void menu(){
 	printf("Hello welcome to cardungeon!\nPlease press one of the following keys:\n1: Play Scoundrel\n2: Play Donsol (Easy)\n3: Play Donsol (Medium)\n4: Play Donsol (Hard)\nS: Scoundrel rules\nD: Donsol rules\nQ: Quit\n");
+	// ANSI escape codes do underline and red color
+	// 0m resets the text formatting
+	printf("\033[4;31mYou may use your keyboard now.\033[0m\n");
 }
 
 int main() {
