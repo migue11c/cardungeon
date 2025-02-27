@@ -1,4 +1,5 @@
 #include <locale.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -38,13 +39,19 @@
 // "\033[31mXH\033[0m","\033[31mJH\033[0m","\033[31mQH\033[0m","\033[31mKH\033[0m",
 // "\033[31mjR\033[0m","\033[35mjB\033[0m"};
 
-struct card{
-    char* name;
+typedef struct{
+    char *name;
     char value;
-    char color;
-};
+    char suit;
+} card;
 
-//static struct card detailedtemplatedeck[52] = {
+typedef struct {
+    card *items;
+    size_t count;
+    size_t capacity;
+} deck;
+
+//static card detailedtemplatedeck[52] = {
 //    {"\033[36mAC\033[0m",'A','C'},{"\033[36m2C\033[0m",'2','C'},{"\033[36m3C\033[0m",'3','C'},{"\033[36m4C\033[0m",'4','C'},
 //    {"\033[36m5C\033[0m",'5','C'},{"\033[36m6C\033[0m",'6','C'},{"\033[36m7C\033[0m",'7','C'},{"\033[36m8C\033[0m",'8','C'},
 //    {"\033[36m9C\033[0m",'9','C'},{"\033[36mXC\033[0m",'X','C'},{"\033[36mJC\033[0m",'J','C'},{"\033[36mQC\033[0m",'Q','C'},
@@ -61,13 +68,13 @@ struct card{
 //};
 
 
-void cardswap(struct card* a, struct card* b){
-    struct card temp = *a;
+void cardswap(card* a,card* b){
+    card temp = *a;
     *a = *b;
     *b = temp;
 }
 
-void deckshuffle(struct card arr[], int size){
+void deckshuffle(card arr[], int size){
     srand(time(NULL));
     for (int i = size-1; i>0; i--){
         int j = rand() % (i+1);
@@ -111,22 +118,19 @@ char getkey() {
 }
 
 void goback(){
-    printf(
-        "\033[36mPress any key to go back...\033[0m\n"
-    );
+    printf("\033[36mPress any key to go back...\033[0m");
 	getkey();
+	printf("\n");
 }
 
 void menu(){
-	printf(
-	   "\nHello welcome to cardungeon!\nPlease press one of the following keys:\nc: Basic controls\ns: Play Scoundrel\nS: Scoundrel rules\nd: Play Donsol\nD: Donsol rules\nr: Play Regicide\nR: Regicide rules\nq: Quit\n"
-	);
+	printf("\nWelcome to cardungeon!\nPlease press one of the following keys:\nc: Basic controls\ns: Play Scoundrel\nS: Scoundrel rules\nd: Play Donsol\nD: Donsol rules\nr: Play Regicide\nR: Regicide rules\nq: Quit\n");
 	// ANSI escape codes do underline and red color
 	// 0m resets the text formatting
 }
 
 void scoundrel() {
-    struct card scoundeck[44] = {
+    card scoundeck[44] = {
         {"\033[36mAC\033[0m",'A','C'},{"\033[36m2C\033[0m",'2','C'},{"\033[36m3C\033[0m",'3','C'},{"\033[36m4C\033[0m",'4','C'},
         {"\033[36m5C\033[0m",'5','C'},{"\033[36m6C\033[0m",'6','C'},{"\033[36m7C\033[0m",'7','C'},{"\033[36m8C\033[0m",'8','C'},
         {"\033[36m9C\033[0m",'9','C'},{"\033[36mXC\033[0m",'X','C'},{"\033[36mJC\033[0m",'J','C'},{"\033[36mQC\033[0m",'Q','C'},
@@ -139,7 +143,15 @@ void scoundrel() {
         {"\033[31m3H\033[0m",'3','H'},{"\033[31m4H\033[0m",'4','H'},{"\033[31m5H\033[0m",'5','H'},{"\033[31m6H\033[0m",'6','H'},
         {"\033[31m7H\033[0m",'7','H'},{"\033[31m8H\033[0m",'8','H'},{"\033[31m9H\033[0m",'9','H'},{"\033[31mXH\033[0m",'X','H'}
     };
+    deck dungeon;
+
 	// shuffle deck
+	//
+	// turn order:
+	// 1: deal hand based on missing cards
+	// 2: discard or play 3 cards
+	//     2.1: cannot discard if last play was a discard, can only discard at the start of the turn
+	//     2.5: if discarded, shuffle hand and append to end of deck array
 
     while (1) {
 	   return;
@@ -147,7 +159,7 @@ void scoundrel() {
 }
 
 void donsol() {
-    struct card donsoldeck[54] = {
+    card donsoldeck[54] = {
         {"\033[36mAC\033[0m",'A','C'},{"\033[36m2C\033[0m",'2','C'},{"\033[36m3C\033[0m",'3','C'},{"\033[36m4C\033[0m",'4','C'},
         {"\033[36m5C\033[0m",'5','C'},{"\033[36m6C\033[0m",'6','C'},{"\033[36m7C\033[0m",'7','C'},{"\033[36m8C\033[0m",'8','C'},
         {"\033[36m9C\033[0m",'9','C'},{"\033[36mXC\033[0m",'X','C'},{"\033[36mJC\033[0m",'J','C'},{"\033[36mQC\033[0m",'Q','C'},
@@ -173,8 +185,14 @@ void donsol() {
 	}
 }
 
-void regishuffle(struct card arr[]){
-    struct card temp[4] = {};
+struct reginemy {
+    card enemy;
+    int hp;
+    int atk;
+};
+
+void regishuffle(card arr[]){
+    card temp[4] = {};
     int iter = 0;
     for (int i = 0; i<12; i++){
         temp[i%4] = arr[i];
@@ -188,12 +206,12 @@ void regishuffle(struct card arr[]){
     }
 }
 
-void regidraw(struct card deck[], struct card hand[], int amt){
+void regidraw(card deck[], card hand[], int amt){
 
 }
 
 void regicide() {
-    struct card regipldeck[40] = {
+    card regipldeck[40] = {
         {"\033[36mAC\033[0m",'A','C'},{"\033[36m2C\033[0m",'2','C'},{"\033[36m3C\033[0m",'3','C'},{"\033[36m4C\033[0m",'4','C'},
         {"\033[36m5C\033[0m",'5','C'},{"\033[36m6C\033[0m",'6','C'},{"\033[36m7C\033[0m",'7','C'},{"\033[36m8C\033[0m",'8','C'},
         {"\033[36m9C\033[0m",'9','C'},{"\033[36mXC\033[0m",'X','C'},{"\033[35mAS\033[0m",'A','S'},{"\033[35m2S\033[0m",'2','S'},
@@ -205,16 +223,16 @@ void regicide() {
         {"\033[31m3H\033[0m",'3','H'},{"\033[31m4H\033[0m",'4','H'},{"\033[31m5H\033[0m",'5','H'},{"\033[31m6H\033[0m",'6','H'},
         {"\033[31m7H\033[0m",'7','H'},{"\033[31m8H\033[0m",'8','H'},{"\033[31m9H\033[0m",'9','H'},{"\033[31mXH\033[0m",'X','H'}
     };
-    struct card regiendeck[12] = {
+    card regiendeck[12] = {
         {"\033[36mJC\033[0m",'J','C'},{"\033[35mJS\033[0m",'J','S'},{"\033[33mJD\033[0m",'J','D'},{"\033[31mJH\033[0m",'J','H'},
         {"\033[36mQC\033[0m",'Q','C'},{"\033[35mQS\033[0m",'Q','S'},{"\033[33mQD\033[0m",'Q','D'},{"\033[31mQH\033[0m",'Q','H'},
         {"\033[36mKC\033[0m",'K','C'},{"\033[35mKS\033[0m",'K','S'},{"\033[33mKD\033[0m",'K','D'},{"\033[31mKH\033[0m",'K','H'}
     };
-    struct card hand[8] = {NULL};
+    card hand[8] = {NULL};
 
 	deckshuffle(regipldeck, 40); // shuffles player deck
 
-	regishuffle(regiendeck); // shuffles enemy deck
+	regishuffle(regiendeck); // special algo for shuffling enemy deck
 
 	// notes to keep in mind
 	//
@@ -244,19 +262,57 @@ void regicide() {
 	printf("\n");
 	#endif
 
-	int enemy = 0; // which enemy in a row are you fighting
-	int enhp = 0; // enemy hp
-	int todraw = 8; // how many cards you need to draw on action
-	int enatk = 0;
-	int newen = 1; // bool to check if there is a new enemy
-	while (enemy!=12) { // very bad approach if facing 2 enemies
-	    if (newen){ // difficulty goes up the more enemies you beat
-			if (enemy == 0){ regidraw(regipldeck, hand, todraw); } // lacks support for more than 1 enemy
-			if (enemy<4){ enhp = 20; enatk = 10; }
-			else if (enemy<8) { enhp = 30; enatk = 15; }
-			else { enhp = 40; enatk = 20; }
-			// lacks actual gameplay loop
+	// game logic needs to go here
+	// first initialize enemy
+	// then draw a full hand (8)
+	//
+	// hearts: heal from discard
+	// diamonds: draw from deck
+	// clubs: deal double damage
+	// spades: reduce enemy attack
+	//
+	// turn order:
+	// 1. Play a card or yield
+	// 2. Activate the suit power
+	// 3. Deal damage to the enemy
+	// 4. Suffer damage from the enemy (pick cards to discard)
+	struct reginemy en = {};
+	int enemy = 0;
+	int newen = 1;
+	int owned = 8;
+	while (enemy < 12 || owned == 0) {
+	    if (newen == 1) {
+			en.enemy = regiendeck[enemy];
+			switch (regiendeck[enemy].value) { // assigns stats to enemy based on card value
+			    case 'J':
+					en.hp = 20;
+					en.atk = 10;
+					break;
+				case 'Q':
+				    en.hp = 30;
+					en.atk = 15;
+					break;
+				case 'K':
+				    en.hp = 40;
+					en.atk = 20;
+					break;
+				default:
+				    printf("invalid value");
+				    break;
+			}
+			newen = 0; // initialized
 		}
+
+		// end of func
+		if (en.hp == 0){
+		    newen = 1; // needs a new enemy if the one is dead
+		}
+	}
+	if (owned == 0){
+	   printf("you lose\n");
+	}
+	else {
+	   printf("killed everyone congrats\n");
 	}
 }
 
@@ -266,8 +322,9 @@ int main() {
 	#endif
     char ch;
 	int gamerunning = 1;
-	// create an introduction
-	printf("\n\n\033[35m\u250F\u2501\u2501\u2501\u2513\n\u2503A  \u2503\n\u2503 S \u2503\n\u2503  A\u2503\n\u2517\u2501\u2501\u2501\u251b\033[0m\n\nThe ace of spades!\n");
+	// welcome message
+	//printf("\n\n\033[35;49m\u250F\u2501\u2501\u2501\u2513\n\u2503\033[45;30mA  \033[35;49m\u2503\n\u2503\033[45;30m S \033[35;49m\u2503\n\u2503\033[45;30m  A\033[35;49m\u2503\n\u2517\u2501\u2501\u2501\u251b\033[0m\n\nThe ace of spades!\n");
+	printf("\n\n\033[30;45m    \033[0m\n\033[30;45m AS \033[0m\n\033[30;45m    \033[0m\n");
 	while(gamerunning){
 		menu();
 input:
@@ -295,7 +352,20 @@ input:
 				regicide();
 				break;
 			case 'R':
-                printf("\nRegicide tutorial\n");
+                printf("\nRegicide is a modern playing card game. Solo rules apply.\n");
+                printf("You win the game by defeating the entire castle deck, composed of Jacks, Queens and Kings (in that order).\n");
+                printf("You lose the game by having an empty hand.\n");
+                printf("You have 8 cards in hand and 2 jokers that allow you to discard your entire hand and pull 8 more from the tavern.\n");
+                printf("Every used card and overkilled enemy goes into discard deck,\nif enemies are defeated with exact amount of damage they go on top of tavern.\n");
+                printf("Jacks have 20hp and 10atk, Queens have 30hp and 15atk, Kings have 40hp and 20atk.\n");
+                printf("Each suit has its' own power:\n\n   Spades permanently reduce enemy atk by value,\n   Clubs deal double damage,\n");
+                printf("   Diamonds draw cards from tavern deck equal to value,\n   \033[31mHearts\033[0m take cards from discard (after shuffling discard) into tavern.\n\n");
+                printf("Depending on enemy suit, that suit will be disabled for the encounter.\n");
+                printf("Value is equal to all played cards summed together.\n");
+                printf("A has a value of 1, all enemy cards have same values as their atk.\n");
+                printf("You can play more than one card if the cards are the same value and their combined value does not exceed 10.\n");
+                printf("A is also an animal companion and can be paired with any card or sets of cards.\n");
+                printf("\nTurn order:\n\n   1. Player plays a card.\n   2. Player activates avaliable suit powers.\n   3. Player deals damage to the enemy.\n   4. Player suffers damage from the enemy, if the enemy isn't defated.\n\n");
                 goback();
 				break;
 			case 'q':
@@ -305,6 +375,6 @@ input:
 				goto input;
 		}
 	}
-	printf("byebye");
+	printf("byebye\n");
 	return 0;
 }
