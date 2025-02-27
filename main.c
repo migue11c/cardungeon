@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #ifdef _WIN32
@@ -40,16 +41,56 @@
 // "\033[31mjR\033[0m","\033[35mjB\033[0m"};
 
 typedef struct{
-    char *name;
-    char value;
-    char suit;
+    char *name; // formatted string meant for card display
+    char value; // this can be int, needs to be defined by each game
+    char suit; // ambiguous regarding jokers in games, but can pass
 } card;
 
 typedef struct {
-    card *items;
-    size_t count;
-    size_t capacity;
+    card *items; // pointer to array of items
+    size_t count; // how many elements are in the deck
+    size_t start; // marks the start of the vector
+    size_t capacity; // how many elements CAN be in the deck (modified by append and trim)
 } deck;
+
+void clearDeck(deck dec) { // entirely deletes the deck
+    free(dec.items);
+    dec.count = 0;
+    dec.capacity = 64;
+}
+
+int getSize(deck dec) {
+    return dec.count;
+}
+
+void deckTrim(deck dec) { // trims the deck from the end
+    // reallocates memory if needed, but reduces the item count at the start of the check
+    if (--dec.count == (dec.capacity/2)-1 && dec.count > 64) {
+        dec.capacity /= 2;
+        dec.items = realloc(dec.items, dec.capacity*sizeof(*dec.items));
+    }
+}
+
+void deckDel(deck dec) { // deletes items from the front
+    // you dont need this michael
+    // cause a memory leak michael
+}
+
+void deckAppend(deck dec, card crd) { // pushes an element to the back of the deck
+    // this part expands the allocation if necessary
+    if (dec.count >= dec.capacity) {
+        if (dec.capacity == 0) dec.capacity = 64;
+        dec.capacity *= 2;
+        dec.items = realloc(dec.items, dec.capacity*sizeof(*dec.items));
+    }
+    dec.items[dec.count++]=crd;
+}
+
+void initDeck(deck dec, card arr[], int size){
+    for (int i=0; i<size;i++){
+        deckAppend(dec, arr[i]);
+    };
+}
 
 //static card detailedtemplatedeck[52] = {
 //    {"\033[36mAC\033[0m",'A','C'},{"\033[36m2C\033[0m",'2','C'},{"\033[36m3C\033[0m",'3','C'},{"\033[36m4C\033[0m",'4','C'},
@@ -77,11 +118,11 @@ void cardswap(card* a,card* b){
     *b = temp;
 }
 
-void deckshuffle(card arr[], int size){
+void deckshuffle(deck dec, int size){
     srand(time(NULL));
     for (int i = size-1; i>0; i--){
         int j = rand() % (i+1);
-        cardswap(&arr[i], &arr[j]);
+        cardswap(&dec.items[i], &dec.items[j]);
     }
 }
 
@@ -127,7 +168,8 @@ void goback(){
 }
 
 void menu(){
-	printf("\nWelcome to cardungeon!\nPlease press one of the following keys:\nc: Basic controls\ns: Play Scoundrel\nS: Scoundrel rules\nd: Play Donsol\nD: Donsol rules\nr: Play Regicide\nR: Regicide rules\nq: Quit\n");
+	printf("\nWelcome to cardungeon!\nPlease press one of the following keys:\nc: Basic controls\n");
+	printf("s: Play Scoundrel\nS: Scoundrel rules\nd: Play Donsol\nD: Donsol rules\nr: Play Regicide\nR: Regicide rules\nx: Stats\nq: Quit\n");
 	// ANSI escape codes do underline and red color
 	// 0m resets the text formatting
 }
@@ -147,6 +189,7 @@ void scoundrel() {
         {"\033[31m7H\033[0m",'7','H'},{"\033[31m8H\033[0m",'8','H'},{"\033[31m9H\033[0m",'9','H'},{"\033[31mXH\033[0m",'X','H'}
     };
     deck dungeon;
+    initDeck(dungeon, scoundeck, 44);
 
 	// shuffle deck
 	//
@@ -178,7 +221,9 @@ void donsol() {
         {"\033[31mXH\033[0m",'X','H'},{"\033[31mJH\033[0m",'J','H'},{"\033[31mQH\033[0m",'Q','H'},{"\033[31mKH\033[0m",'Y','H'},
         {"\033[31mjR\033[0m",'j','R'},{"\033[35mjB\033[0m",'j','B'}
     };
-    deckshuffle(donsoldeck, 54);
+    deck dungeon;
+    initDeck(dungeon,donsoldeck,54);
+    deckshuffle(dungeon, 54);
     // all 54 cards with ANSI values
 	printf("donsol\n");
 	// shuffle deck
@@ -194,23 +239,19 @@ struct reginemy {
     int atk;
 };
 
-void regishuffle(card arr[]){
-    card temp[4] = {};
+void regishuffle(deck dec){
+    deck temp = {};
     int iter = 0;
     for (int i = 0; i<12; i++){
-        temp[i%4] = arr[i];
+        temp.items[i%4] = dec.items[i];
         if (i%4==3){
             deckshuffle(temp, 4);
             for (int j = 0; j<4;j++){
-                arr[iter] = temp[j];
+                dec.items[iter] = temp.items[j];
                 iter++;
             }
         }
     }
-}
-
-void regidraw(card deck[], card hand[], int amt){
-
 }
 
 void regicide() {
@@ -233,10 +274,13 @@ void regicide() {
     };
     card hand[8] = {NULL};
 
-	deckshuffle(regipldeck, 40); // shuffles player deck
+	deck castle, tavern, discard;
+	initDeck(castle, regiendeck, 12);
+	initDeck(tavern, regipldeck, 40);
 
-	regishuffle(regiendeck); // special algo for shuffling enemy deck
+	deckshuffle(tavern, 40); // shuffles player deck
 
+	regishuffle(castle); // special algo for shuffling enemy deck
 	// notes to keep in mind
 	//
 	// stats: atk/hp
@@ -333,45 +377,52 @@ int main() {
 input:
 		switch (getkey()) {
 		    case 'c':
-				printf("\nCards are displayed as a value and suit.\nValues are displayed as: A,2,3,4,5,6,7,8,9,X,J,Q,K, X is 10 but as a single character.\nSuits are displayed as: \033[35mS\033[0mpades,\033[36mC\033[0mlubs,\033[33mD\033[0miamonds,\033[31mH\033[0mearts\nExample: \033[31mAH\033[0m, \033[36m9C\033[0m\nJokers are displayed as: \033[31mjR\033[0m and \033[35mjB\033[0m\nAll relevant controls will be shown on the screen during each turn.\n\n");
+				printf("\nCards are displayed as a value and suit.\n");
+				printf("Values are displayed as: A,2,3,4,5,6,7,8,9,X,J,Q,K, X is 10 but as a single character.\n");
+				printf("Suits are displayed as: \033[35mS\033[0mpades,\033[36mC\033[0mlubs,\033[33mD\033[0miamonds,\033[31mH\033[0mearts\n");
+				printf("Example: \033[31mAH\033[0m, \033[36m9C\033[0m\n");
+				printf("Jokers are displayed as: \033[31mjR\033[0m and \033[35mjB\033[0m\n");
+				printf("All relevant controls will be shown on the screen during each turn.\n\n");
 				goback();
 				break;
 			case 'x':
 			    stats();
 				goback();
 			case 's':
-			    // everything is done within scoundrel();
-			    scoundrel();
+			    scoundrel(); // starts scoundrel
 				break;
-			case 'S':
+			case 'S': // scoundrel rules
 			    printf("\nScoundrel tutorial\n");
                 goback();
 				break;
 			case 'd':
-				donsol();
+				donsol(); // starts donsol (first difficulty picker, quits if specified)
 				break;
-			case 'D':
+			case 'D': // donsol rules
                 printf("\nDonsol tutorial\n");
                 goback();
 				break;
 			case 'r':
-				regicide();
+				regicide(); // starts regicide
 				break;
-			case 'R':
+			case 'R': // regicide rules
                 printf("\nRegicide is a modern playing card game. Solo rules apply.\n");
                 printf("You win the game by defeating the entire castle deck, composed of Jacks, Queens and Kings (in that order).\n");
                 printf("You lose the game by having an empty hand.\n");
                 printf("You have 8 cards in hand and 2 jokers that allow you to discard your entire hand and pull 8 more from the tavern.\n");
-                printf("Every used card and overkilled enemy goes into discard deck,\nif enemies are defeated with exact amount of damage they go on top of tavern.\n");
+                printf("Every used card and overkilled enemy goes into discard deck,\n");
+                printf("if enemies are defeated with exact amount of damage they go on top of tavern.\n");
                 printf("Jacks have 20hp and 10atk, Queens have 30hp and 15atk, Kings have 40hp and 20atk.\n");
                 printf("Each suit has its' own power:\n\n   Spades permanently reduce enemy atk by value,\n   Clubs deal double damage,\n");
-                printf("   Diamonds draw cards from tavern deck equal to value,\n   \033[31mHearts\033[0m take cards from discard (after shuffling discard) into tavern.\n\n");
+                printf("   Diamonds draw cards from tavern deck equal to value,\n");
+                printf("   \033[31mHearts\033[0m take cards from discard (after shuffling discard) into tavern.\n\n");
                 printf("Depending on enemy suit, that suit will be disabled for the encounter.\n");
                 printf("Value is equal to all played cards summed together.\n");
                 printf("A has a value of 1, all enemy cards have same values as their atk.\n");
                 printf("You can play more than one card if the cards are the same value and their combined value does not exceed 10.\n");
                 printf("A is also an animal companion and can be paired with any card or sets of cards.\n");
-                printf("\nTurn order:\n\n   1. Player plays a card.\n   2. Player activates avaliable suit powers.\n   3. Player deals damage to the enemy.\n   4. Player suffers damage from the enemy, if the enemy isn't defated.\n\n");
+                printf("\nTurn order:\n\n   1. Player plays a card.\n   2. Player activates avaliable suit powers.\n");
+                printf("   3. Player deals damage to the enemy.\n   4. Player suffers damage from the enemy, if the enemy isn't defated.\n\n");
                 goback();
 				break;
 			case 'q':
