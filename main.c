@@ -161,7 +161,7 @@ char getkey() {
 	#endif
 }
 
-void goback(){
+void goback(){ // returns to the menu screen
     printf("\033[36mPress any key to go back...\033[0m");
 	getkey();
 	printf("\n");
