@@ -383,24 +383,20 @@ input:
 				printf("Example: \033[31mAH\033[0m, \033[36m9C\033[0m\n");
 				printf("Jokers are displayed as: \033[31mjR\033[0m and \033[35mjB\033[0m\n");
 				printf("All relevant controls will be shown on the screen during each turn.\n\n");
-				goback();
 				break;
 			case 'x':
 			    stats();
-				goback();
 			case 's':
 			    scoundrel(); // starts scoundrel
 				break;
 			case 'S': // scoundrel rules
 			    printf("\nScoundrel tutorial\n");
-                goback();
 				break;
 			case 'd':
 				donsol(); // starts donsol (first difficulty picker, quits if specified)
 				break;
 			case 'D': // donsol rules
                 printf("\nDonsol tutorial\n");
-                goback();
 				break;
 			case 'r':
 				regicide(); // starts regicide
@@ -423,13 +419,13 @@ input:
                 printf("A is also an animal companion and can be paired with any card or sets of cards.\n");
                 printf("\nTurn order:\n\n   1. Player plays a card.\n   2. Player activates avaliable suit powers.\n");
                 printf("   3. Player deals damage to the enemy.\n   4. Player suffers damage from the enemy, if the enemy isn't defated.\n\n");
-                goback();
 				break;
 			case 'q':
 				gamerunning = 0;
 				break;
 			default:
 				goto input;
+			goback();
 		}
 	}
 	printf("byebye\n");

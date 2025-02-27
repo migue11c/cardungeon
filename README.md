@@ -1,6 +1,7 @@
-There are 2 games in this program:
+There are 3 games in this program:
     - Scoundrel
     - Donsol (with 3 difficulties)
+    - Regicide
 
 Scoundrel rules:
     - Jokerless deck without red J,Q,K, and A cards.
