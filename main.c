@@ -67,6 +67,9 @@ typedef struct {
 //    {"\033[31mXH\033[0m",'X','H'},{"\033[31mJH\033[0m",'J','H'},{"\033[31mQH\033[0m",'Q','H'},{"\033[31mKH\033[0m",'Y','H'}
 //};
 
+void stats() {
+
+}
 
 void cardswap(card* a,card* b){
     card temp = *a;
@@ -333,6 +336,9 @@ input:
 				printf("\nCards are displayed as a value and suit.\nValues are displayed as: A,2,3,4,5,6,7,8,9,X,J,Q,K, X is 10 but as a single character.\nSuits are displayed as: \033[35mS\033[0mpades,\033[36mC\033[0mlubs,\033[33mD\033[0miamonds,\033[31mH\033[0mearts\nExample: \033[31mAH\033[0m, \033[36m9C\033[0m\nJokers are displayed as: \033[31mjR\033[0m and \033[35mjB\033[0m\nAll relevant controls will be shown on the screen during each turn.\n\n");
 				goback();
 				break;
+			case 'x':
+			    stats();
+				goback();
 			case 's':
 			    // everything is done within scoundrel();
 			    scoundrel();
