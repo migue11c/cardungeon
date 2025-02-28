@@ -37,47 +37,124 @@ typedef struct {
     size_t capacity; // how many elements CAN be in the deck (modified by append and trim)
 } deck;
 
-void clearDeck(deck dec) { // entirely deletes the deck
-    free(dec.items);
-    dec.count = 0;
-    dec.capacity = 64;
-}
-
-int getSize(deck dec) {
-    return dec.count;
-}
-
-void deckTrim(deck dec) { // trims the deck from the end
-    // reallocates memory if needed, but reduces the item count at the start of the check
-    if (--dec.count == (dec.capacity/2)-1 && dec.count > 64) {
-        dec.capacity /= 2;
-        dec.items = realloc(dec.items, dec.capacity*sizeof(*dec.items));
+// gigantic fucking switch statement lol
+// retrieves the value from the char of the card based on the game
+int getValue(char rank, char game){
+    switch (rank) {
+        case '2':
+            return 2;
+        case '3':
+            return 3;
+        case '4':
+            return 4;
+        case '5':
+            return 5;
+        case '6':
+            return 6;
+        case '7':
+            return 7;
+        case '8':
+            return 8;
+        case '9':
+            return 9;
+        case 'X':
+            return 10;
+        case 'J':
+            switch (game) {
+                case 'r':
+                    return 10;
+                default:
+                    return 11;
+            }
+        case 'Q':
+            switch (game) {
+                case 'r':
+                    return 15;
+                case 'd':
+                    return 13;
+                default:
+                    return 12;
+            }
+        case 'K':
+            switch (game) {
+                case 'r':
+                    return 20;
+                case 'd':
+                    return 15;
+                default:
+                    return 13;
+            }
+        case 'A':
+            switch (game) {
+                case 'r':
+                    return 1;
+                case 'd':
+                    return 17;
+                default:
+                    return 11;
+            }
+        case 'j':
+            switch (game) {
+                case 'd':
+                    return 21;
+                default:
+                    return 0;
+            }
+        default:
+            return 0;
     }
 }
 
-void deckDel(deck dec) { // deletes items from the front
-    // you dont need this michael
-    // cause a memory leak michael
-}
+// frees the memory
+#define clearDeck(T)\
+    do {\
+        free(T.items);\
+        T.count = 0;\
+        T.capacity = 64;\
+    } while(0)
 
-void deckAppend(deck dec, card crd) { // pushes an element to the back of the deck
-    // this part expands the allocation if necessary
-    if (dec.count >= dec.capacity) {
-        if (dec.capacity == 0) dec.capacity = 64;
-        dec.capacity *= 2;
-        dec.items = realloc(dec.items, dec.capacity*sizeof(*dec.items));
-    }
-    dec.items[dec.count++] = crd;
-}
+// all of these need to be macros
 
-void initDeck(deck dec, card arr[], int size){
-    dec.capacity = 64;
-    dec.count = 0;
-    dec.items = malloc(dec.capacity*sizeof(*dec.items));
-    for (int i=0; i<size;i++){
-        deckAppend(dec, arr[i]);
-    };
-}
+#define initDeck(T)\
+    do {\
+        T.count = 0;\
+        T.capacity = 64;\
+        T.items = malloc(T.capacity*sizeof(*T.items));\
+    } while(0);
+
+
+// trims the deck from behind, memory can still be accessed for leftover cards but it will be changed after appending.
+// no need to set the value to null when we have array size
+#define deckTrim(T)\
+    do {\
+        if (--T.count == (T.capacity/2)-1 && T.count > 64) {\
+        T.capacity /= 2;\
+        T.items = realloc(T.items, T.capacity*sizeof(*T.items));\
+        }\
+    } while(0);
+
+// void deckDel(deck dec) { // deletes items from the front
+//     // you dont need this michael
+//     // cause a memory leak michael
+// }
+
+#define deckAppend(T, I)\
+    do {\
+        if (T.count >= T.capacity) {\
+            if (T.capacity == 0) T.capacity = 64;\
+            T.capacity *= 2;\
+            T.items = realloc(T.items, T.capacity*sizeof(*T.items));\
+        }\
+        T.items[T.count++] = I;\
+    } while(0);
+
+
+#define fillDeck(T, A, S)\
+    do {\
+        for (int i = 0; i<S; i++){\
+            deckAppend(T,A[i]);\
+        };\
+    } while(0);
 
 // \u2663 clubs
 // \u2660 spades
@@ -143,19 +220,20 @@ void stats() {
 
 }
 
-void cardswap(card *a, card *b){
+void cardswap(card *a, card *b){ // this works cuz it's a pointer to a type?
     card temp = *a;
     *a = *b;
     *b = temp;
 }
 
-void deckshuffle(deck dec){
-    srand(time(NULL));
-    for (int i = dec.count-1; i>0; i--){
-        int j = rand() % (i+1);
-        cardswap(&dec.items[i], &dec.items[j]);
-    }
-}
+#define deckShuffle(T)\
+    do {\
+        srand(time(NULL));\
+        for (int i = T.count-1; i>0; i--){\
+            int j = rand() % (i+1);\
+            cardswap(&T.items[i], &T.items[j]);\
+        };\
+    } while(0);
 
 char getkey() {
 	#ifdef _WIN32
@@ -174,6 +252,10 @@ char getkey() {
 		return ch;
 	#endif
 }
+
+void debug(){
+
+};
 
 void goback(){ // returns to the menu screen
     printf("\033[36mPress any key to go back...\033[0m");
@@ -236,7 +318,7 @@ void scoundrel() {
         {"\033[31mX\u2665\033[0m",'X','H'}
     };
     deck dungeon;
-    initDeck(dungeon, scoundeck, 44);
+    initDeck(dungeon);
 
 	// shuffle deck
 	//
@@ -310,8 +392,8 @@ void donsol() {
     };
 
     deck dungeon;
-    initDeck(dungeon,donsoldeck,54);
-    deckshuffle(dungeon);
+    initDeck(dungeon);
+    deckShuffle(dungeon);
     // all 54 cards with ANSI values
 	printf("donsol\n");
 	// shuffle deck
@@ -339,7 +421,7 @@ void regishuffle(deck dec){
         temp.items[i%4] = dec.items[i];
         printf("test1\n");
         if (i%4==3){
-            deckshuffle(temp);
+            deckShuffle(temp);
             printf("test2\n");
             for (int j = 0; j<4;j++){
                 dec.items[iter] = temp.items[j];
@@ -408,11 +490,12 @@ void regicide() {
     };
 
     deck castle, tavern, discard;
-	initDeck(castle, regiendeck, 12);
-
-	initDeck(tavern, regipldeck, 40);
-	deckshuffle(tavern); // shuffles player deck
-	regishuffle(castle); // special algo for shuffling enemy deck
+	initDeck(castle);
+	initDeck(tavern);
+	fillDeck(castle, regiendeck, 12);
+	fillDeck(tavern, regipldeck, 40);
+	deckShuffle(tavern); // shuffles player deck
+	//regishuffle(castle); // special algo for shuffling enemy deck
 
 	// there is something wrong with regishuffle
 
@@ -424,9 +507,10 @@ void regicide() {
 	// K 20/40
 	// this can be easily managed
 	//
-	// first jacks then queens than kings
+	// first jacks then queens than kings (done)
 
-	#ifdef _DEBUG
+#ifdef _DEBUG
+	printf("\ndebugging");
 	printf("\n");
 	for (int i=0;i<40;i++){
 		printf("%s ",tavern.items[i].name);
@@ -442,7 +526,7 @@ void regicide() {
 		}
 	}
 	printf("\n");
-	#endif
+#endif
 
 	// game logic needs to go here
 	// first initialize enemy
@@ -462,6 +546,7 @@ void regicide() {
 	int enemy = 0;
 	int newen = 1;
 	int owned = 8;
+#ifdef _GAME
 	while (enemy < 12 || owned == 0) {
 	    if (newen == 1) {
 			en.enemy = regiendeck[enemy];
@@ -490,6 +575,7 @@ void regicide() {
 		    newen = 1; // needs a new enemy if the one is dead
 		}
 	}
+#endif
 	if (owned == 0){
 	   printf("you lose\n");
 	}
@@ -522,6 +608,12 @@ input:
 				break;
 			case 'x':
 			    stats();
+				break;
+#ifdef _DEBUG
+			case '.':
+			    debug();
+				break;
+#endif
 			case 's':
 			    scoundrel(); // starts scoundrel
 				break;
@@ -558,12 +650,13 @@ input:
 				break;
 			case 'q':
 				gamerunning = 0;
-				break;
+				goto leave;
 			default:
 				goto input;
-			goback();
 		}
+		goback();
 	}
+leave:
 	printf("byebye\n");
 	return 0;
 }
