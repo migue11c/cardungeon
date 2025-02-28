@@ -333,8 +333,9 @@ void regishuffle(deck dec){
     temp.capacity = 64;
     temp.items = malloc(4*sizeof(*temp.items));
     int iter = 0;
-    for (int i = 0; i<12; i++){
+    for (int i = 0; i<dec.count; i++){
         printf("test0\n"); // there is an issue here
+        //cardswap(&temp.items[i%4], &dec.items[i]);
         temp.items[i%4] = dec.items[i];
         printf("test1\n");
         if (i%4==3){
