@@ -1,4 +1,3 @@
-#include <_mingw_mac.h>
 #include <locale.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -15,7 +14,7 @@
 	#include <unistd.h>
 #endif
 
-#define _DEBUG
+//#define _DEBUG
 
 // needs to either be reformatted into one deck, called upon the start of the game or will stay like this for each new game added
 // will also be really nice to add ANSI to each card
@@ -378,13 +377,22 @@ void donsol() {
     };
 
     deck dungeon;
+	card playing[4];
+	bool empty[4]={0,0,0,0};
+	int difficulty;
     initDeck(dungeon);
+	fillDeck(dungeon, donsoldeck, 54);
     deckShuffle(dungeon);
-    // all 54 cards with ANSI values
-	printf("donsol\n");
-	// shuffle deck
 
 	while (1) {
+dondiffin:
+		switch (getkey()){
+			case '1':
+			case '2':
+			case '3':
+			default: goto dondiffin;
+		}
+
 	    return;
 	}
 }
@@ -950,16 +958,20 @@ input:
 				break;
 #endif
 			case 's':
+				printf("COMING SOON\n");
 			    scoundrel(); // starts scoundrel
 				break;
 			case 'S': // scoundrel rules
 			    printf("\nScoundrel tutorial\n");
+				printf("COMING SOON\n");
 				break;
 			case 'd':
+				printf("COMING SOON\n");
 				donsol(); // starts donsol (first difficulty picker, quits if specified)
 				break;
 			case 'D': // donsol rules
                 printf("\nDonsol tutorial\n");
+				printf("COMING SOON\n");
 				break;
 			case 'r':
 				regicide(); // starts regicide
