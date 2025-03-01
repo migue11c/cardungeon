@@ -389,22 +389,80 @@ typedef struct{
 
 #define regishuffle(T)\
     do {\
-    deck temp; temp.count = 4; temp.capacity = 64;\
-    temp.items = malloc(4*sizeof(*temp.items));\
-    int iter = 0;\
-    for (int i = 0; i<dec.count; i++){\
-        printf("test0\n");\
-        temp.items[i%4] = dec.items[i];\
-        printf("test1\n");\
-        if (i%4==3){\
-            deckShuffle(temp);\
-            printf("test2\n");\
-            for (int j = 0; j<4;j++){\
-                dec.items[iter] = temp.items[j];\
-                iter++;\
+        deck temp; temp.count = 4; temp.capacity = 64;\
+        temp.items = malloc(4*sizeof(*temp.items));\
+        int iter = 0;\
+        for (int i = 0; i<T.count; i++){\
+            printf("test0\n");\
+            temp.items[i%4] = T.items[i];\
+            printf("test1\n");\
+            if (i%4==3){\
+                deckShuffle(temp);\
+                printf("test2\n");\
+                for (int j = 0; j<4;j++){\
+                    T.items[iter] = temp.items[j];\
+                    iter++;\
+                }\
             }\
         }\
-    }\
+    } while(0);
+
+// 0 hand is fine
+// 1 combo with A has more than 2 cards
+// 2 matched combo without A or Regi has more than 10 value
+// 3 combo has unmatched cards
+// 4 no selected cards
+
+int regiHandCheck(deck hand, bool held[]) {
+    int val = 0;
+    int first = 0;
+    bool containsA = false;
+    bool matched = false;
+    bool containsRegi = false;
+    int cardnum = 0;
+    int temp;
+    for (int i = 0;i<8;i++){
+        if (held[i]) {
+            temp = getValue(hand.items[i].value, 'r');
+            if (temp == 1){ //these stay true permanently
+                containsA = true;
+            }
+            if (temp > 10){
+                containsRegi = true;
+            }
+            switch (++cardnum) {
+                case 1:
+                    if (!containsA){
+                        first = temp;
+                    }
+                    break;
+                case 2:
+                    if (!containsA) {
+                        matched = (temp == first);
+                        if (!matched) {
+                            return 3; // unmatched 2 cards without A
+                        }
+                    }
+                    break;
+                default:
+                    if (containsA){
+                        return 1; // 3 cards in A combo
+                    }
+                    else if (matched) {
+                        matched = (temp == first);
+                        if (!matched) {
+                            return 3; // unmatched 3 cards withut A
+                        }
+                    }
+                    break;
+            }
+            val += temp;
+        }
+    }
+    if (!containsA && !containsRegi && val > 10) {
+        return 2; // bad sum
+    }
+    return 0;
 }
 
 void regicide() {
@@ -473,7 +531,7 @@ void regicide() {
 	fillDeck(castle, regiendeck, 12);
 	fillDeck(tavern, regipldeck, 40);
 	deckShuffle(tavern); // shuffles player deck
-	//regishuffle(castle); // special algo for shuffling enemy deck
+	regishuffle(castle); // special algo for shuffling enemy deck
 
 	// there is something wrong with regishuffle
 
@@ -524,10 +582,15 @@ void regicide() {
 	regienemy en = {};
 	int enemy = 0;
 	bool newen = 1;
-	int owned = 8;
-	bool held[8] = {0};
-	bool empty[8] = {1};
-	while (enemy < 12 || owned == 0) {
+	int missing = 8;
+	bool held[8] = {false};
+	bool empty[8] = {true};
+	bool confirm = false;
+
+	// draw hand of 8 (remove 8 from tavern)
+
+	goto noplay;
+	while (enemy < 12 || missing != 8) {
 	    if (newen) { // STEP 0 draws the new enemy from castle
 			en.enemy = castle.items[enemy];
 			switch (castle.items[enemy].value) { // assigns stats to enemy based on card value
@@ -550,23 +613,76 @@ void regicide() {
 			printf("\n%s, hp: %d, atk: %d\n",en.enemy.name, en.hp, en.atk);
 			newen = false; // initialized
 		}
+
 		// STEP 1 getkey switch for playing the game
-reginput1:
-		switch (getkey()) {
-		    case '1':
-				if (empty[0]) {
-				    goto reginput1;
-				}
-				held[0]++;
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			default: goto reginput1;
-		}
+regs1:
+        while (!confirm) {
+            switch (getkey()) {
+                case '1':
+                    if (empty[0]) {
+                        break;
+                    }
+                    held[0] = !held[0];
+                    break;
+                case '2':
+              		if (empty[1]) {
+                  		break;
+              		}
+              		held[1] = !held[1];
+                    break;
+                case '3':
+              		if (empty[2]) {
+               	        break;
+              		}
+               	    held[2] = !held[2];
+                    break;
+                case '4':
+                    if (empty[3]) {
+                        break;
+                    }
+                    held[3] = !held[3];
+                    break;
+                case '5':
+                    if (empty[4]) {
+                        break;
+                    }
+                    held[4] = !held[4];
+                    break;
+                case '6':
+                    if (empty[5]) {
+                        break;
+                    }
+                    held[5] = !held[5];
+                    break;
+                case '7':
+                    if (empty[6]) {
+                        break;
+                    }
+                    held[6] = !held[6];
+                    break;
+                case '8':
+                    if (empty[7]) {
+                        break;
+                    }
+                    held[7] = !held[7];
+                    break;
+                case '\r':
+                    // needs a check if everything is as it should be
+
+                    confirm = true;
+                    break;
+				default: break;
+            }
+        }
+        confirm = false; // resets value of confirm bool
+        regiHandCheck(hand, held); // not fully implemented
+        // goto regs1 if bad code;
+        // step 2 add values
+
+        // step 3 activate powers
+        // check for enemy suit
+
+        // step 3.5 check if enemy is alive
 		if (en.hp <= 0){
 		    if (en.hp == 0){
 				// add to top of the deck
@@ -574,12 +690,16 @@ reginput1:
 		    enemy++;
 		    newen = 1; // needs a new enemy if the one is dead
 		}
+
+		// step 4 getkey to pick damage taken
+
 	}
-	if (owned == 0){
-	   printf("you lose\n");
+	noplay:
+	if (missing == 8){
+	   printf("\nyou lose\n");
 	}
 	else {
-	   printf("killed everyone congrats\n");
+	   printf("\nkilled everyone congrats\n");
 	}
 }
 
