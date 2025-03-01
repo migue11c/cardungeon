@@ -477,18 +477,25 @@ int regiHandCheck(deck hand, bool held[]) {
 
 #define getUsedCards(D,H) ({int retval=0; for (int i=0;i<D.count;i++){if(H[i]){retval++;};}; retval;});
 
-#define regiPrint(X,Y)\
+#define regiPrint(X,Y,Z)\
     do {\
-        printf("\n");\
+        printf("\nTavern\n");\
         for (int i=0;i<X.count;i++){\
-            printf("%s ",X.items[i].name);\
+            printf("%s ",X.items[i+X.start].name);\
             if (i%10==9){\
                 printf("\n");\
             }\
         }\
-        printf("\n");\
+        printf("\nDiscard\n");\
         for (int i=0;i<Y.count;i++){\
-            printf("%s ",Y.items[i].name);\
+            printf("%s ",Y.items[i+Y.start].name);\
+            if (i%10==9){\
+                printf("\n");\
+            }\
+        }\
+        printf("\nCastle\n");\
+        for (int i=0;i<Z.count;i++){\
+            printf("%s ",Z.items[i+Z.start].name);\
             if (i%10==9){\
                 printf("\n");\
             }\
@@ -593,6 +600,7 @@ void regicide() {
 	// 4. Suffer damage from the enemy (pick cards to discard)
 
 	// pre-game setup
+	int jokers = 2;
 	regienemy en = {};
 	int enemy = 0;
 	bool newen = 1;
@@ -605,6 +613,8 @@ void regicide() {
 	// draw hand of 8 (remove 8 from tavern)
 	for (int i = 0; i<8; i++){
 	    deckAppend(hand, drawLogic(tavern));
+		//tavern.start++;
+		//tavern.count--;
 	}
 
 //	goto noplayreg;
@@ -636,9 +646,9 @@ regs1:
         while (!confirm) {
             // needs to display enemy, atk, hp and your hand along with selected cards
             #ifdef _DEBUG
-            regiPrint(tavern, castle);
+            regiPrint(tavern, discard, castle);
             #endif
-            printf("\n %s   HP:%d  ATK:%d\n\n ur cards:%d\n",en.enemy.name, en.hp, en.atk, 8-missing);
+            printf("\n %s   HP:%d  ATK:%d\n\n ur cards:%d   ur jokers:%d\n",en.enemy.name, en.hp, en.atk, 8-missing, jokers);
             for (int i = 0; i<8; i++){ // player hand
                 if (held[i]) {
                     printf("*");
@@ -653,7 +663,7 @@ regs1:
                     printf("   ");
                 }
             }
-            printf("\n");
+            printf("\n 1-8: Select/deselect a card   j: Play a joker   Enter: confirm your selection\n");
 regs1in:
             switch (getkey()) {
                 case '1':
@@ -706,6 +716,11 @@ regs1in:
                     break;
                 case 'j':
                     goto noplayreg;
+                    if (jokers > 0) {
+                        // discard entire hand
+                        // fill the hand with drawing
+                        jokers --;
+                    }
                     // needs to empty hand to discard, draw new cards from tavern and disable one joker use
                     break;
                 case '\r':
@@ -724,10 +739,13 @@ regs1in:
             case 0:
                 printf(" hand is good\n\n");
                 break;
+
+            case 1: printf(" cannot pair more than 2 aces\n"); goto regs1;
+            case 2: printf(" paired cards add up to higher than 10\n"); goto regs1;
+            case 3: printf(" bad hand\n"); goto regs1;
+            case 4: printf(" no card selected\n"); goto regs1;
             // needs more cases to explain what's bad
-            default:
-                printf(" bad hand\n");
-                goto regs1;
+            default: printf(" invalid hand\n"); goto regs1;
                 // goto regs1 if bad hand;
         }
 
@@ -769,17 +787,22 @@ regs1in:
             }
         }
         // step 3 activate powers
+        // order matters
+        if (suits[3]) ;
+        if (suits[2]) ;
+        if (suits[1]) dmg *= 2;
+        if (suits[0])
 
         // step 3.1 enemy takes damage
         en.hp -= dmg;
 
         // step 3.5 check if enemy is alive
 		if (en.hp <= 0){
+		    deckAppend(discard, castle.items[enemy]);
 		    if (en.hp == 0){
-				// add to top of the deck
+				tavern.items[tavern.start-1] = castle.items[enemy]; tavern.start--; tavern.count++;
 			}
-		    enemy++;
-		    newen = true; // needs a new enemy if the one is dead
+		    enemy++; newen = true; // needs a new enemy if the one is dead
 		}
 
 		// step 4 getkey to pick damage taken
@@ -792,6 +815,10 @@ regs1in:
 	else {
 	   printf("\nkilled everyone congrats\n");
 	}
+	clearDeck(tavern);
+	clearDeck(castle);
+	clearDeck(hand);
+	clearDeck(discard);
 }
 
 int main() {
