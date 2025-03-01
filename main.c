@@ -1,4 +1,5 @@
 #include <locale.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,67 +42,44 @@ typedef struct {
 // retrieves the value from the char of the card based on the game
 int getValue(char rank, char game){
     switch (rank) {
-        case '2':
-            return 2;
-        case '3':
-            return 3;
-        case '4':
-            return 4;
-        case '5':
-            return 5;
-        case '6':
-            return 6;
-        case '7':
-            return 7;
-        case '8':
-            return 8;
-        case '9':
-            return 9;
-        case 'X':
-            return 10;
+        case '2': return 2;
+        case '3': return 3;
+        case '4': return 4;
+        case '5': return 5;
+        case '6': return 6;
+        case '7': return 7;
+        case '8': return 8;
+        case '9': return 9;
+        case 'X': return 10;
         case 'J':
             switch (game) {
-                case 'r':
-                    return 10;
-                default:
-                    return 11;
+                case 'r': return 10;
+                default: return 11;
             }
         case 'Q':
             switch (game) {
-                case 'r':
-                    return 15;
-                case 'd':
-                    return 13;
-                default:
-                    return 12;
+                case 'r': return 15;
+                case 'd': return 13;
+                default: return 12;
             }
         case 'K':
             switch (game) {
-                case 'r':
-                    return 20;
-                case 'd':
-                    return 15;
-                default:
-                    return 13;
+                case 'r': return 20;
+                case 'd': return 15;
+                default: return 13;
             }
         case 'A':
             switch (game) {
-                case 'r':
-                    return 1;
-                case 'd':
-                    return 17;
-                default:
-                    return 11;
+                case 'r': return 1;
+                case 'd': return 17;
+                default: return 11;
             }
         case 'j':
             switch (game) {
-                case 'd':
-                    return 21;
-                default:
-                    return 0;
+                case 'd': return 21;
+                default: return 0;
             }
-        default:
-            return 0;
+        default: return 0;
     }
 }
 
@@ -217,7 +195,7 @@ int getValue(char rank, char game){
 //};
 
 void stats() {
-
+    // needs to parse a file containing plaintext of 5 of each game's scores
 }
 
 void cardswap(card *a, card *b){ // this works cuz it's a pointer to a type?
@@ -403,32 +381,30 @@ void donsol() {
 	}
 }
 
-struct reginemy {
+typedef struct{
     card enemy;
     int hp;
     int atk;
-};
+} regienemy;
 
-void regishuffle(deck dec){
-    deck temp;
-    temp.count = 4;
-    temp.capacity = 64;
-    temp.items = malloc(4*sizeof(*temp.items));
-    int iter = 0;
-    for (int i = 0; i<dec.count; i++){
-        printf("test0\n"); // there is an issue here
-        //cardswap(&temp.items[i%4], &dec.items[i]);
-        temp.items[i%4] = dec.items[i];
-        printf("test1\n");
-        if (i%4==3){
-            deckShuffle(temp);
-            printf("test2\n");
-            for (int j = 0; j<4;j++){
-                dec.items[iter] = temp.items[j];
-                iter++;
-            }
-        }
-    }
+#define regishuffle(T)\
+    do {\
+    deck temp; temp.count = 4; temp.capacity = 64;\
+    temp.items = malloc(4*sizeof(*temp.items));\
+    int iter = 0;\
+    for (int i = 0; i<dec.count; i++){\
+        printf("test0\n");\
+        temp.items[i%4] = dec.items[i];\
+        printf("test1\n");\
+        if (i%4==3){\
+            deckShuffle(temp);\
+            printf("test2\n");\
+            for (int j = 0; j<4;j++){\
+                dec.items[iter] = temp.items[j];\
+                iter++;\
+            }\
+        }\
+    }\
 }
 
 void regicide() {
@@ -489,9 +465,11 @@ void regicide() {
         {"\033[31mK\u2665\033[0m",'K','H'}
     };
 
-    deck castle, tavern, discard;
+    deck castle, tavern, discard, hand;
 	initDeck(castle);
 	initDeck(tavern);
+	initDeck(discard);
+	initDeck(hand);
 	fillDeck(castle, regiendeck, 12);
 	fillDeck(tavern, regipldeck, 40);
 	deckShuffle(tavern); // shuffles player deck
@@ -510,7 +488,6 @@ void regicide() {
 	// first jacks then queens than kings (done)
 
 #ifdef _DEBUG
-	printf("\ndebugging");
 	printf("\n");
 	for (int i=0;i<40;i++){
 		printf("%s ",tavern.items[i].name);
@@ -542,15 +519,18 @@ void regicide() {
 	// 2. Activate the suit power
 	// 3. Deal damage to the enemy
 	// 4. Suffer damage from the enemy (pick cards to discard)
-	struct reginemy en = {};
+
+	// pre-game setup
+	regienemy en = {};
 	int enemy = 0;
-	int newen = 1;
+	bool newen = 1;
 	int owned = 8;
-#ifdef _GAME
+	bool held[8] = {0};
+	bool empty[8] = {1};
 	while (enemy < 12 || owned == 0) {
-	    if (newen == 1) {
-			en.enemy = regiendeck[enemy];
-			switch (regiendeck[enemy].value) { // assigns stats to enemy based on card value
+	    if (newen) { // STEP 0 draws the new enemy from castle
+			en.enemy = castle.items[enemy];
+			switch (castle.items[enemy].value) { // assigns stats to enemy based on card value
 			    case 'J':
 					en.hp = 20;
 					en.atk = 10;
@@ -567,15 +547,34 @@ void regicide() {
 				    printf("invalid value");
 				    break;
 			}
-			newen = 0; // initialized
+			printf("\n%s, hp: %d, atk: %d\n",en.enemy.name, en.hp, en.atk);
+			newen = false; // initialized
 		}
-
-		// end of func
-		if (en.hp == 0){
+		// STEP 1 getkey switch for playing the game
+reginput1:
+		switch (getkey()) {
+		    case '1':
+				if (empty[0]) {
+				    goto reginput1;
+				}
+				held[0]++;
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			default: goto reginput1;
+		}
+		if (en.hp <= 0){
+		    if (en.hp == 0){
+				// add to top of the deck
+			}
+		    enemy++;
 		    newen = 1; // needs a new enemy if the one is dead
 		}
 	}
-#endif
 	if (owned == 0){
 	   printf("you lose\n");
 	}
@@ -589,7 +588,7 @@ int main() {
         SetConsoleOutputCP(CP_UTF8);  // For Windows
 	#endif
     char ch;
-	int gamerunning = 1;
+	bool gamerunning = true;
 	// welcome message
 	//printf("\n\n\033[35;49m\u250F\u2501\u2501\u2501\u2513\n\u2503\033[45;30mA  \033[35;49m\u2503\n\u2503\033[45;30m \u2660 \033[35;49m\u2503\n\u2503\033[45;30m  A\033[35;49m\u2503\n\u2517\u2501\u2501\u2501\u251b\033[0m\n\nThe ace of spades!\n");
 	printf("\n\n\033[35;49m\u250F\u2501\u2501\u2501\u2513\n\u2503A  \u2503\n\u2503 \u2660 \u2503\n\u2503  A\u2503\n\u2517\u2501\u2501\u2501\u251b\033[0m\n\nThe ace of spades!\n");
@@ -649,7 +648,7 @@ input:
                 printf("   3. Player deals damage to the enemy.\n   4. Player suffers damage from the enemy, if the enemy isn't defated.\n\n");
 				break;
 			case 'q':
-				gamerunning = 0;
+				gamerunning = false;
 				goto leave;
 			default:
 				goto input;
