@@ -1,5 +1,5 @@
+#include <_mingw_mac.h>
 #include <locale.h>
-#include <minwindef.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -125,7 +125,7 @@ int getValue(char rank, char game){
             T.capacity *= 2;\
             T.items = realloc(T.items, T.capacity*sizeof(*T.items));\
         }\
-        T.items[T.count++] = I;\
+        T.items[T.start+T.count++] = I;\
     } while(0);
 
 
@@ -473,6 +473,17 @@ int regiHandCheck(deck hand, bool held[]) {
     return 0; //otherwise valid
 }
 
+bool regiDmgCheck (deck dec, bool held[], int atk){
+    int total=0;
+    for (int i = 0; i<8;i++){
+        if(held[i]){
+            total += getValue(dec.items[i].value, 'r');
+        }
+    }
+    if (total >= atk) return true;
+    else return false;
+}
+
 #define getRegiValue(D,H) ({int retval=0; for (int i=0;i<D.count;i++){if(H[i]){retval+=getValue(D.items[i].value,'r');};}; retval;});
 
 #define getUsedCards(D,H) ({int retval=0; for (int i=0;i<D.count;i++){if(H[i]){retval++;};}; retval;});
@@ -571,8 +582,6 @@ void regicide() {
 	deckShuffle(tavern); // shuffles player deck
 	regishuffle(castle); // special algo for shuffling enemy deck
 
-	// there is something wrong with regishuffle
-
 	// notes to keep in mind
 	//
 	// stats: atk/hp
@@ -619,6 +628,7 @@ void regicide() {
 
 //	goto noplayreg;
 	while (enemy < 12 && missing < 8) {
+regstart:
 	    if (newen) { // STEP 0 draws the new enemy from castle
 			en.enemy = castle.items[enemy];
 			switch (castle.items[enemy].value) { // assigns stats to enemy based on card value
@@ -644,90 +654,82 @@ void regicide() {
 		// STEP 1 getkey switch for playing the game
 regs1:
         while (!confirm) {
+            printf("\n-----------------------------------------------------------\n");
             // needs to display enemy, atk, hp and your hand along with selected cards
             #ifdef _DEBUG
             regiPrint(tavern, discard, castle);
             #endif
             printf("\n %s   HP:%d  ATK:%d\n\n ur cards:%d   ur jokers:%d\n",en.enemy.name, en.hp, en.atk, 8-missing, jokers);
             for (int i = 0; i<8; i++){ // player hand
-                if (held[i]) {
-                    printf("*");
-                }
-                else {
-                    printf(" ");
-                }
-                if (!empty[i]) {
-                    printf("%s ",hand.items[i].name);
-                }
-                else {
-                    printf("   ");
-                }
+                if (held[i]) printf("*");
+                else printf(" ");
+                if (!empty[i]) printf("%s ",hand.items[i].name);
+                else printf("   ");
             }
-            printf("\n 1-8: Select/deselect a card   j: Play a joker   Enter: confirm your selection\n");
+            printf("\n 1-8: Select/deselect a card");
+            if (jokers > 0) printf("   j: Play a joker");
+            printf("   Enter: confirm\n");
 regs1in:
             switch (getkey()) {
                 case '1':
-                    if (empty[0]) {
-                        goto regs1in;
-                    }
+                    if (empty[0]) goto regs1in;
                     held[0] = !held[0];
                     break;
                 case '2':
-              		if (empty[1]) {
-                        goto regs1in;
-              		}
+              		if (empty[1]) goto regs1in;
               		held[1] = !held[1];
                     break;
                 case '3':
-              		if (empty[2]) {
-                        goto regs1in;
-              		}
+              		if (empty[2]) goto regs1in;
                	    held[2] = !held[2];
                     break;
                 case '4':
-                    if (empty[3]) {
-                        goto regs1in;
-                    }
+                    if (empty[3]) goto regs1in;
                     held[3] = !held[3];
                     break;
                 case '5':
-                    if (empty[4]) {
-                        goto regs1in;
-                    }
+                    if (empty[4]) goto regs1in;
                     held[4] = !held[4];
                     break;
                 case '6':
-                    if (empty[5]) {
-                        goto regs1in;
-                    }
+                    if (empty[5]) goto regs1in;
                     held[5] = !held[5];
                     break;
                 case '7':
-                    if (empty[6]) {
-                        goto regs1in;
-                    }
+                    if (empty[6]) goto regs1in;
                     held[6] = !held[6];
                     break;
                 case '8':
-                    if (empty[7]) {
-                        goto regs1in;
-                    }
+                    if (empty[7]) goto regs1in;
                     held[7] = !held[7];
                     break;
                 case 'j':
-                    goto noplayreg;
                     if (jokers > 0) {
-                        // discard entire hand
-                        // fill the hand with drawing
+                        for (int i=0;i<8;i++){
+                            if (held[i]) {
+                                held[i] = false;
+                            }
+                            if (!empty[i]) {
+                                deckAppend(discard, hand.items[i]);
+                                missing++;
+                            }
+                            empty[i] = false;
+                            if (tavern.count>0) {
+                                hand.items[i] = tavern.items[tavern.start];
+                                tavern.start++; tavern.count--;
+                                missing--;
+                            }
+                        }
                         jokers --;
+                    }
+                    else {
+                        goto regs1in;
                     }
                     // needs to empty hand to discard, draw new cards from tavern and disable one joker use
                     break;
-                case '\r':
-                    // needs a check if everything is as it should be
-
-                    confirm = true;
-                    break;
+                case '\r': confirm = true; break;
+                case '\n': confirm = true; break;
+                case 'q': goto noplayreg;
 				default: goto regs1in;
             }
         }
@@ -736,14 +738,11 @@ regs1in:
         // step 2 add values and check hand
 
         switch (regiHandCheck(hand, held)) {
-            case 0:
-                printf(" hand is good\n\n");
-                break;
-
-            case 1: printf(" cannot pair more than 2 aces\n"); goto regs1;
-            case 2: printf(" paired cards add up to higher than 10\n"); goto regs1;
-            case 3: printf(" bad hand\n"); goto regs1;
-            case 4: printf(" no card selected\n"); goto regs1;
+            case 0: break; // hand is good
+            case 1: goto regs1in; // cannot pair more than 2 aces;
+            case 2: goto regs1in; // paired cards add up to higher than 10
+            case 3: goto regs1in; // bad pair
+            case 4: goto regs1in; // no card selected
             // needs more cases to explain what's bad
             default: printf(" invalid hand\n"); goto regs1;
                 // goto regs1 if bad hand;
@@ -776,7 +775,41 @@ regs1in:
         }
         #ifdef _DEBUG
         printf("\nS:%d, C:%d, D:%d, H:%d\n",suits[0],suits[1],suits[2],suits[3]);
+        printf("\ndmg: %d\n",dmg);
         #endif
+        // step 3 activate powers
+        // order matters
+        if (suits[3]) { // hearts shuffle discard and then put num of cards into bottom of deck
+            deckShuffle(discard);
+            int temp = discard.count;
+            for (int i=0; i<temp && i<dmg;i++){
+                deckAppend(tavern, discard.items[i]);
+                discard.count--;
+            }
+        };
+        if (suits[2]) { // draws cards from the deck
+            int drawn=0;
+            for (int i=0; i<8 && drawn<dmg && tavern.count>0; i++) {
+                if (empty[i]) {
+                    hand.items[i] = tavern.items[tavern.start];
+                    tavern.start++; tavern.count--;
+                    empty[i] = false;
+                    missing--;
+                    drawn++;
+                }
+            }
+        }
+        if (suits[0]) { // reduces atk
+            en.atk -= dmg;
+            if (en.atk < 0) {
+                en.atk = 0;
+            }
+        }
+        if (suits[1]) dmg *= 2; // doubles damage
+
+        // step 3.1 enemy takes damage
+        en.hp -= dmg;
+
         for (int i = 0; i<8;i++){ // empty hands
             if (!empty[i]) {
                 if (held[i]) {
@@ -786,16 +819,6 @@ regs1in:
                 }
             }
         }
-        // step 3 activate powers
-        // order matters
-        if (suits[3]) ;
-        if (suits[2]) ;
-        if (suits[1]) dmg *= 2;
-        if (suits[0])
-
-        // step 3.1 enemy takes damage
-        en.hp -= dmg;
-
         // step 3.5 check if enemy is alive
 		if (en.hp <= 0){
 		    deckAppend(discard, castle.items[enemy]);
@@ -803,10 +826,85 @@ regs1in:
 				tavern.items[tavern.start-1] = castle.items[enemy]; tavern.start--; tavern.count++;
 			}
 		    enemy++; newen = true; // needs a new enemy if the one is dead
+			goto regstart;
+		}
+regs2:
+
+        // step 4 getkey to pick damage taken
+        if (en.atk == 0) goto regs1;
+
+		while (!confirm && missing<8) {
+		    printf("\n-----------------------------------------------------------\n");
+		    printf("\n %s   HP:%d  ATK:%d\n\n ur cards:%d   ur jokers:%d\n",en.enemy.name, en.hp, en.atk, 8-missing, jokers);
+            for (int i = 0; i<8; i++){ // player hand
+                if (held[i]) printf("*");
+                else printf(" ");
+                if (!empty[i]) printf("%s ",hand.items[i].name);
+                else printf("   ");
+            }
+            printf("\n 1-8: Select/deselect a card   Enter: confirm\n");
+regs2in:
+		    switch (getkey()) {
+				case '1':
+                    if (empty[0]) goto regs2in;
+                    held[0] = !held[0];
+                    break;
+                case '2':
+              		if (empty[1]) goto regs2in;
+              		held[1] = !held[1];
+                    break;
+                case '3':
+              		if (empty[2]) goto regs2in;
+               	    held[2] = !held[2];
+                    break;
+                case '4':
+                    if (empty[3]) goto regs2in;
+                    held[3] = !held[3];
+                    break;
+                case '5':
+                    if (empty[4]) goto regs2in;
+                    held[4] = !held[4];
+                    break;
+                case '6':
+                    if (empty[5]) goto regs2in;
+                    held[5] = !held[5];
+                    break;
+                case '7':
+                    if (empty[6]) goto regs2in;
+                    held[6] = !held[6];
+                    break;
+                case '8':
+                    if (empty[7]) goto regs2in;
+                    held[7] = !held[7];
+                    break;
+                case '\r': confirm = true; break;
+                case '\n': confirm = true; break;
+                case 'q': goto noplayreg;
+                default:
+                    goto regs2in;
+			}
+		}
+		confirm = false;
+		if (!regiDmgCheck(hand, held, en.atk)){
+		    int use = getUsedCards(hand, held); // checks if not enough cards are left
+			if (use == 8-missing) {
+			    missing = 8;
+			    goto noplayreg;
+			}
+		    goto regs2in;
 		}
 
-		// step 4 getkey to pick damage taken
+		missing += getUsedCards(hand, held); // add 'missing' counter
 
+		for (int i = 0; i<8;i++){ // empty hands
+            if (!empty[i]) {
+                if (held[i]) {
+                    empty[i] = true;
+                    deckAppend(discard, hand.items[i]);
+                    held[i] = false;
+                }
+            }
+        }
 	}
 	noplayreg:
 	if (missing >= 8){
