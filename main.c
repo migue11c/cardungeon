@@ -590,32 +590,6 @@ void regicide() {
 	deckShuffle(tavern); // shuffles player deck
 	regishuffle(castle); // special algo for shuffling enemy deck
 
-	// notes to keep in mind
-	//
-	// stats: atk/hp
-	// J 10/20
-	// Q 15/30
-	// K 20/40
-	// this can be easily managed
-	//
-	// first jacks then queens than kings (done)
-
-
-	// game logic needs to go here
-	// first initialize enemy
-	// then draw a full hand (8)
-	//
-	// hearts: heal from discard
-	// diamonds: draw from deck
-	// clubs: deal double damage
-	// spades: reduce enemy attack
-	//
-	// turn order:
-	// 1. Play a card or yield
-	// 2. Activate the suit power
-	// 3. Deal damage to the enemy
-	// 4. Suffer damage from the enemy (pick cards to discard)
-
 	// pre-game setup
 	bool perfect = 0;
 	int jokers = 2;
@@ -635,7 +609,6 @@ void regicide() {
 		//tavern.count--;
 	}
 
-//	goto noplayreg;
 	while (enemy < 12 && missing < 8) {
 regstart:
 	    if (newen) { // STEP 0 draws the new enemy from castle
@@ -674,7 +647,8 @@ regs1:
             regiPrint(tavern, discard, castle);
             #endif
             printf("\n Enemy:%s(%d)  HP:%d  ATK:%d\n\n Hand:%d | Tavern:%lu | Discard:%lu | Jokers:%d\n",en.enemy.name, enemy, en.hp, en.atk, 8-missing, (unsigned long)tavern.count, (unsigned long)discard.count, jokers);
-            printf(" \u250F\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2513\n |");
+            printf(" \u250F\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2513\n");
+            printf(" \u2503");
             for (int i = 0; i<8; i++){ // player hand
                 if (held[i]) printf("\033[47m");
                 if (!empty[i]) printf(" %s \033[49m\u2503",hand.items[i].name);
@@ -855,7 +829,8 @@ regs2:
             regiPrint(tavern, discard, castle);
             #endif
             printf("\n Enemy:%s(%d)  HP:%d  ATK:%d\n\n Hand:%d | Tavern:%lu | Discard:%lu | Jokers:%d\n",en.enemy.name, enemy, en.hp, en.atk, 8-missing, (unsigned long)tavern.count, (unsigned long)discard.count, jokers);
-            printf(" \u250F\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2513\n |");
+            printf(" \u250F\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2513\n");
+            printf(" \u2503");
             for (int i = 0; i<8; i++){ // player hand
                 if (held[i]) printf("\033[47m");
                 if (!empty[i]) printf(" %s \033[49m\u2503",hand.items[i].name);
