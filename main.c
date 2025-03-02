@@ -524,60 +524,60 @@ bool regiDmgCheck (deck dec, bool held[], int atk){
 
 void regicide() {
     card regipldeck[40] = {
-        {"\033[36mA\u2663\033[0m",'A','C'},
-        {"\033[36m2\u2663\033[0m",'2','C'},
-        {"\033[36m3\u2663\033[0m",'3','C'},
-        {"\033[36m4\u2663\033[0m",'4','C'},
-        {"\033[36m5\u2663\033[0m",'5','C'},
-        {"\033[36m6\u2663\033[0m",'6','C'},
-        {"\033[36m7\u2663\033[0m",'7','C'},
-        {"\033[36m8\u2663\033[0m",'8','C'},
-        {"\033[36m9\u2663\033[0m",'9','C'},
-        {"\033[36mX\u2663\033[0m",'X','C'},
-        {"\033[35mA\u2660\033[0m",'A','S'},
-        {"\033[35m2\u2660\033[0m",'2','S'},
-        {"\033[35m3\u2660\033[0m",'3','S'},
-        {"\033[35m4\u2660\033[0m",'4','S'},
-        {"\033[35m5\u2660\033[0m",'5','S'},
-        {"\033[35m6\u2660\033[0m",'6','S'},
-        {"\033[35m7\u2660\033[0m",'7','S'},
-        {"\033[35m8\u2660\033[0m",'8','S'},
-        {"\033[35m9\u2660\033[0m",'9','S'},
-        {"\033[35mX\u2660\033[0m",'X','S'},
-        {"\033[33mA\u2666\033[0m",'A','D'},
-        {"\033[33m2\u2666\033[0m",'2','D'},
-        {"\033[33m3\u2666\033[0m",'3','D'},
-        {"\033[33m4\u2666\033[0m",'4','D'},
-        {"\033[33m5\u2666\033[0m",'5','D'},
-        {"\033[33m6\u2666\033[0m",'6','D'},
-        {"\033[33m7\u2666\033[0m",'7','D'},
-        {"\033[33m8\u2666\033[0m",'8','D'},
-        {"\033[33m9\u2666\033[0m",'9','D'},
-        {"\033[33mX\u2666\033[0m",'X','D'},
-        {"\033[31mA\u2665\033[0m",'A','H'},
-        {"\033[31m2\u2665\033[0m",'2','H'},
-        {"\033[31m3\u2665\033[0m",'3','H'},
-        {"\033[31m4\u2665\033[0m",'4','H'},
-        {"\033[31m5\u2665\033[0m",'5','H'},
-        {"\033[31m6\u2665\033[0m",'6','H'},
-        {"\033[31m7\u2665\033[0m",'7','H'},
-        {"\033[31m8\u2665\033[0m",'8','H'},
-        {"\033[31m9\u2665\033[0m",'9','H'},
-        {"\033[31mX\u2665\033[0m",'X','H'}
+        {"\033[36mA\u2663\033[39m",'A','C'},
+        {"\033[36m2\u2663\033[39m",'2','C'},
+        {"\033[36m3\u2663\033[39m",'3','C'},
+        {"\033[36m4\u2663\033[39m",'4','C'},
+        {"\033[36m5\u2663\033[39m",'5','C'},
+        {"\033[36m6\u2663\033[39m",'6','C'},
+        {"\033[36m7\u2663\033[39m",'7','C'},
+        {"\033[36m8\u2663\033[39m",'8','C'},
+        {"\033[36m9\u2663\033[39m",'9','C'},
+        {"\033[36mX\u2663\033[39m",'X','C'},
+        {"\033[35mA\u2660\033[39m",'A','S'},
+        {"\033[35m2\u2660\033[39m",'2','S'},
+        {"\033[35m3\u2660\033[39m",'3','S'},
+        {"\033[35m4\u2660\033[39m",'4','S'},
+        {"\033[35m5\u2660\033[39m",'5','S'},
+        {"\033[35m6\u2660\033[39m",'6','S'},
+        {"\033[35m7\u2660\033[39m",'7','S'},
+        {"\033[35m8\u2660\033[39m",'8','S'},
+        {"\033[35m9\u2660\033[39m",'9','S'},
+        {"\033[35mX\u2660\033[39m",'X','S'},
+        {"\033[33mA\u2666\033[39m",'A','D'},
+        {"\033[33m2\u2666\033[39m",'2','D'},
+        {"\033[33m3\u2666\033[39m",'3','D'},
+        {"\033[33m4\u2666\033[39m",'4','D'},
+        {"\033[33m5\u2666\033[39m",'5','D'},
+        {"\033[33m6\u2666\033[39m",'6','D'},
+        {"\033[33m7\u2666\033[39m",'7','D'},
+        {"\033[33m8\u2666\033[39m",'8','D'},
+        {"\033[33m9\u2666\033[39m",'9','D'},
+        {"\033[33mX\u2666\033[39m",'X','D'},
+        {"\033[31mA\u2665\033[39m",'A','H'},
+        {"\033[31m2\u2665\033[39m",'2','H'},
+        {"\033[31m3\u2665\033[39m",'3','H'},
+        {"\033[31m4\u2665\033[39m",'4','H'},
+        {"\033[31m5\u2665\033[39m",'5','H'},
+        {"\033[31m6\u2665\033[39m",'6','H'},
+        {"\033[31m7\u2665\033[39m",'7','H'},
+        {"\033[31m8\u2665\033[39m",'8','H'},
+        {"\033[31m9\u2665\033[39m",'9','H'},
+        {"\033[31mX\u2665\033[39m",'X','H'}
     };
     card regiendeck[12] = {
-        {"\033[36mJ\u2663\033[0m",'J','C'},
-        {"\033[35mJ\u2660\033[0m",'J','S'},
-        {"\033[33mJ\u2666\033[0m",'J','D'},
-        {"\033[31mJ\u2665\033[0m",'J','H'},
-        {"\033[36mQ\u2663\033[0m",'Q','C'},
-        {"\033[35mQ\u2660\033[0m",'Q','S'},
-        {"\033[33mQ\u2666\033[0m",'Q','D'},
-        {"\033[31mQ\u2665\033[0m",'Q','H'},
-        {"\033[36mK\u2663\033[0m",'K','C'},
-        {"\033[35mK\u2660\033[0m",'K','S'},
-        {"\033[33mK\u2666\033[0m",'K','D'},
-        {"\033[31mK\u2665\033[0m",'K','H'}
+        {"\033[36mJ\u2663\033[39m",'J','C'},
+        {"\033[35mJ\u2660\033[39m",'J','S'},
+        {"\033[33mJ\u2666\033[39m",'J','D'},
+        {"\033[31mJ\u2665\033[39m",'J','H'},
+        {"\033[36mQ\u2663\033[39m",'Q','C'},
+        {"\033[35mQ\u2660\033[39m",'Q','S'},
+        {"\033[33mQ\u2666\033[39m",'Q','D'},
+        {"\033[31mQ\u2665\033[39m",'Q','H'},
+        {"\033[36mK\u2663\033[39m",'K','C'},
+        {"\033[35mK\u2660\033[39m",'K','S'},
+        {"\033[33mK\u2666\033[39m",'K','D'},
+        {"\033[31mK\u2665\033[39m",'K','H'}
     };
 
     deck castle, tavern, discard, hand;
@@ -617,6 +617,7 @@ void regicide() {
 	// 4. Suffer damage from the enemy (pick cards to discard)
 
 	// pre-game setup
+	bool perfect = 0;
 	int jokers = 2;
 	regienemy en = {};
 	int enemy = 0;
@@ -662,21 +663,26 @@ regstart:
 		// STEP 1 getkey switch for playing the game
 regs1:
         while (!confirm) {
-            printf("\n-----------------------------------------------------------\n");
+            if (missing == 8) {
+                goto regs2;
+            }
+            printf("\n ---------------------------------------------------------------\n\n Attack!");
+            if (perfect) {printf("   Perfect kill!"); perfect = 0;}
+            printf("\n");
             // needs to display enemy, atk, hp and your hand along with selected cards
             #ifdef _DEBUG
             regiPrint(tavern, discard, castle);
             #endif
-            printf("\n %s   HP:%d  ATK:%d\n\n ur cards:%d   ur jokers:%d\n",en.enemy.name, en.hp, en.atk, 8-missing, jokers);
+            printf("\n Enemy:%s(%d)  HP:%d  ATK:%d\n\n Hand:%d | Tavern:%lu | Discard:%lu | Jokers:%d\n",en.enemy.name, enemy, en.hp, en.atk, 8-missing, (unsigned long)tavern.count, (unsigned long)discard.count, jokers);
+            printf(" \u250F\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2513\n |");
             for (int i = 0; i<8; i++){ // player hand
-                if (held[i]) printf("*");
-                else printf(" ");
-                if (!empty[i]) printf("%s ",hand.items[i].name);
-                else printf("   ");
+                if (held[i]) printf("\033[47m");
+                if (!empty[i]) printf(" %s \033[49m\u2503",hand.items[i].name);
+                else printf("    \u2503");
             }
-            printf("\n 1-8: Select/deselect a card");
+            printf("\n \u2517\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u251b\n 1-8: Select/deselect a card");
             if (jokers > 0) printf("   j: Play a joker");
-            printf("   Enter: confirm\n");
+            printf("   Enter: confirm   q: Quit\n");
 regs1in:
             switch (getkey()) {
                 case '1':
@@ -785,6 +791,15 @@ regs1in:
         printf("\nS:%d, C:%d, D:%d, H:%d\n",suits[0],suits[1],suits[2],suits[3]);
         printf("\ndmg: %d\n",dmg);
         #endif
+        for (int i = 0; i<8;i++){ // empty hands
+            if (!empty[i]) {
+                if (held[i]) {
+                    empty[i] = true;
+                    deckAppend(discard, hand.items[i]);
+                    held[i] = false;
+                }
+            }
+        }
         // step 3 activate powers
         // order matters
         if (suits[3]) { // hearts shuffle discard and then put num of cards into bottom of deck
@@ -818,19 +833,11 @@ regs1in:
         // step 3.1 enemy takes damage
         en.hp -= dmg;
 
-        for (int i = 0; i<8;i++){ // empty hands
-            if (!empty[i]) {
-                if (held[i]) {
-                    empty[i] = true;
-                    deckAppend(discard, hand.items[i]);
-                    held[i] = false;
-                }
-            }
-        }
         // step 3.5 check if enemy is alive
 		if (en.hp <= 0){
 		    deckAppend(discard, castle.items[enemy]);
 		    if (en.hp == 0){
+				perfect = 1;
 				tavern.items[tavern.start-1] = castle.items[enemy]; tavern.start--; tavern.count++;
 			}
 		    enemy++; newen = true; // needs a new enemy if the one is dead
@@ -842,15 +849,20 @@ regs2:
         if (en.atk == 0) goto regs1;
 
 		while (!confirm && missing<8) {
-		    printf("\n-----------------------------------------------------------\n");
-		    printf("\n %s   HP:%d  ATK:%d\n\n ur cards:%d   ur jokers:%d\n",en.enemy.name, en.hp, en.atk, 8-missing, jokers);
+		    printf("\n ---------------------------------------------------------------\n\n Defend!\n");
+            // needs to display enemy, atk, hp and your hand along with selected cards
+            #ifdef _DEBUG
+            regiPrint(tavern, discard, castle);
+            #endif
+            printf("\n Enemy:%s(%d)  HP:%d  ATK:%d\n\n Hand:%d | Tavern:%lu | Discard:%lu | Jokers:%d\n",en.enemy.name, enemy, en.hp, en.atk, 8-missing, (unsigned long)tavern.count, (unsigned long)discard.count, jokers);
+            printf(" \u250F\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2513\n |");
             for (int i = 0; i<8; i++){ // player hand
-                if (held[i]) printf("*");
-                else printf(" ");
-                if (!empty[i]) printf("%s ",hand.items[i].name);
-                else printf("   ");
+                if (held[i]) printf("\033[47m");
+                if (!empty[i]) printf(" %s \033[49m\u2503",hand.items[i].name);
+                else printf("    \u2503");
             }
-            printf("\n 1-8: Select/deselect a card   Enter: confirm\n");
+            printf("\n \u2517\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u253b\u2501\u2501\u2501\u2501\u251b\n");
+            printf(" 1-8: Select/deselect a card   Enter: confirm   q: Quit\n");
 regs2in:
 		    switch (getkey()) {
 				case '1':

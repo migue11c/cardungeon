@@ -1,1 +1,1 @@
-1. use printf("%ul",(unsigned long)value); if the value is size_t type.
+1. use printf("%lu",(unsigned long)value); if the value is size_t type.
