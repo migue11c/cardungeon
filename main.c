@@ -14,7 +14,7 @@
 	#include <unistd.h>
 #endif
 
-//#define _DEBUG
+#define _DEBUG
 
 // needs to either be reformatted into one deck, called upon the start of the game or will stay like this for each new game added
 // will also be really nice to add ANSI to each card
@@ -809,11 +809,10 @@ regs1in:
 
         // step 3.5 check if enemy is alive
 		if (en.hp <= 0){
-		    deckAppend(discard, castle.items[enemy]);
 		    if (en.hp == 0){
 				perfect = 1;
 				tavern.items[tavern.start-1] = castle.items[enemy]; tavern.start--; tavern.count++;
-			}
+			} else deckAppend(discard, castle.items[enemy]);
 		    enemy++; newen = true; // needs a new enemy if the one is dead
 			goto regstart;
 		}
