@@ -53,23 +53,27 @@ int getValue(char rank, char game){
         case 'X': return 10;
         case 'J':
             switch (game) {
+                case 'x': return 11;
                 case 'r': return 10;
                 default: return 11;
             }
         case 'Q':
             switch (game) {
+                case 'x': return 11;
                 case 'r': return 15;
                 case 'd': return 13;
                 default: return 12;
             }
         case 'K':
             switch (game) {
+                case 'x': return 11;
                 case 'r': return 20;
                 case 'd': return 15;
                 default: return 13;
             }
         case 'A':
             switch (game) {
+                case 'x': return 11;
                 case 'r': return 1;
                 case 'd': return 17;
                 default: return 11;
@@ -205,11 +209,9 @@ void cardswap(card *a, card *b){ // this works cuz it's a pointer to a type?
     *b = temp;
 }
 
-card drawFromDeck(deck dec){
-    return dec.items[dec.start];
-}
-
 #define drawLogic(T) ({T.count--; card retval = T.items[T.start++]; retval;})
+// usage: deckAppend(deck output, drawLogic(deck input));
+// adds the first card of the input deck to the last card of the output deck
 
 #define deckShuffle(T)\
     do {\
@@ -219,6 +221,7 @@ card drawFromDeck(deck dec){
             cardswap(&T.items[i], &T.items[j]);\
         };\
     } while(0);
+// shuffles the cards around
 
 char getkey() {
 	#ifdef _WIN32
@@ -320,80 +323,125 @@ void scoundrel() {
 
 void donsol() {
     card donsoldeck[54] = {
-        {"\033[36mA\u2663\033[0m",'A','C'},
-        {"\033[36m2\u2663\033[0m",'2','C'},
-        {"\033[36m3\u2663\033[0m",'3','C'},
-        {"\033[36m4\u2663\033[0m",'4','C'},
-        {"\033[36m5\u2663\033[0m",'5','C'},
-        {"\033[36m6\u2663\033[0m",'6','C'},
-        {"\033[36m7\u2663\033[0m",'7','C'},
-        {"\033[36m8\u2663\033[0m",'8','C'},
-        {"\033[36m9\u2663\033[0m",'9','C'},
-        {"\033[36mX\u2663\033[0m",'X','C'},
-        {"\033[36mJ\u2663\033[0m",'J','C'},
-        {"\033[36mQ\u2663\033[0m",'Q','C'},
-        {"\033[36mK\u2663\033[0m",'K','C'},
-        {"\033[35mA\u2660\033[0m",'A','S'},
-        {"\033[35m2\u2660\033[0m",'2','S'},
-        {"\033[35m3\u2660\033[0m",'3','S'},
-        {"\033[35m4\u2660\033[0m",'4','S'},
-        {"\033[35m5\u2660\033[0m",'5','S'},
-        {"\033[35m6\u2660\033[0m",'6','S'},
-        {"\033[35m7\u2660\033[0m",'7','S'},
-        {"\033[35m8\u2660\033[0m",'8','S'},
-        {"\033[35m9\u2660\033[0m",'9','S'},
-        {"\033[35mX\u2660\033[0m",'X','S'},
-        {"\033[35mJ\u2660\033[0m",'J','S'},
-        {"\033[35mQ\u2660\033[0m",'Q','S'},
-        {"\033[35mK\u2660\033[0m",'K','S'},
-        {"\033[33mA\u2666\033[0m",'A','D'},
-        {"\033[33m2\u2666\033[0m",'2','D'},
-        {"\033[33m3\u2666\033[0m",'3','D'},
-        {"\033[33m4\u2666\033[0m",'4','D'},
-        {"\033[33m5\u2666\033[0m",'5','D'},
-        {"\033[33m6\u2666\033[0m",'6','D'},
-        {"\033[33m7\u2666\033[0m",'7','D'},
-        {"\033[33m8\u2666\033[0m",'8','D'},
-        {"\033[33m9\u2666\033[0m",'9','D'},
-        {"\033[33mX\u2666\033[0m",'X','D'},
-        {"\033[33mJ\u2666\033[0m",'J','D'},
-        {"\033[33mQ\u2666\033[0m",'Q','D'},
-        {"\033[33mK\u2666\033[0m",'K','D'},
-        {"\033[31mA\u2665\033[0m",'A','H'},
-        {"\033[31m2\u2665\033[0m",'2','H'},
-        {"\033[31m3\u2665\033[0m",'3','H'},
-        {"\033[31m4\u2665\033[0m",'4','H'},
-        {"\033[31m5\u2665\033[0m",'5','H'},
-        {"\033[31m6\u2665\033[0m",'6','H'},
-        {"\033[31m7\u2665\033[0m",'7','H'},
-        {"\033[31m8\u2665\033[0m",'8','H'},
-        {"\033[31m9\u2665\033[0m",'9','H'},
-        {"\033[31mX\u2665\033[0m",'X','H'},
-        {"\033[31mJ\u2665\033[0m",'J','H'},
-        {"\033[31mQ\u2665\033[0m",'Q','H'},
-        {"\033[31mK\u2665\033[0m",'Y','H'},
-        {"\033[31mjR\033[0m",'j','R'},
-        {"\033[35mjB\033[0m",'j','B'}
+        {"\033[36mA\u2663\033[39m",'A','C'},
+        {"\033[36m2\u2663\033[39m",'2','C'},
+        {"\033[36m3\u2663\033[39m",'3','C'},
+        {"\033[36m4\u2663\033[39m",'4','C'},
+        {"\033[36m5\u2663\033[39m",'5','C'},
+        {"\033[36m6\u2663\033[39m",'6','C'},
+        {"\033[36m7\u2663\033[39m",'7','C'},
+        {"\033[36m8\u2663\033[39m",'8','C'},
+        {"\033[36m9\u2663\033[39m",'9','C'},
+        {"\033[36mX\u2663\033[39m",'X','C'},
+        {"\033[36mJ\u2663\033[39m",'J','C'},
+        {"\033[36mQ\u2663\033[39m",'Q','C'},
+        {"\033[36mK\u2663\033[39m",'K','C'},
+        {"\033[35mA\u2660\033[39m",'A','S'},
+        {"\033[35m2\u2660\033[39m",'2','S'},
+        {"\033[35m3\u2660\033[39m",'3','S'},
+        {"\033[35m4\u2660\033[39m",'4','S'},
+        {"\033[35m5\u2660\033[39m",'5','S'},
+        {"\033[35m6\u2660\033[39m",'6','S'},
+        {"\033[35m7\u2660\033[39m",'7','S'},
+        {"\033[35m8\u2660\033[39m",'8','S'},
+        {"\033[35m9\u2660\033[39m",'9','S'},
+        {"\033[35mX\u2660\033[39m",'X','S'},
+        {"\033[35mJ\u2660\033[39m",'J','S'},
+        {"\033[35mQ\u2660\033[39m",'Q','S'},
+        {"\033[35mK\u2660\033[39m",'K','S'},
+        {"\033[33mA\u2666\033[39m",'A','D'},
+        {"\033[33m2\u2666\033[39m",'2','D'},
+        {"\033[33m3\u2666\033[39m",'3','D'},
+        {"\033[33m4\u2666\033[39m",'4','D'},
+        {"\033[33m5\u2666\033[39m",'5','D'},
+        {"\033[33m6\u2666\033[39m",'6','D'},
+        {"\033[33m7\u2666\033[39m",'7','D'},
+        {"\033[33m8\u2666\033[39m",'8','D'},
+        {"\033[33m9\u2666\033[39m",'9','D'},
+        {"\033[33mX\u2666\033[39m",'X','D'},
+        {"\033[33mJ\u2666\033[39m",'J','D'},
+        {"\033[33mQ\u2666\033[39m",'Q','D'},
+        {"\033[33mK\u2666\033[39m",'K','D'},
+        {"\033[31mA\u2665\033[39m",'A','H'},
+        {"\033[31m2\u2665\033[39m",'2','H'},
+        {"\033[31m3\u2665\033[39m",'3','H'},
+        {"\033[31m4\u2665\033[39m",'4','H'},
+        {"\033[31m5\u2665\033[39m",'5','H'},
+        {"\033[31m6\u2665\033[39m",'6','H'},
+        {"\033[31m7\u2665\033[39m",'7','H'},
+        {"\033[31m8\u2665\033[39m",'8','H'},
+        {"\033[31m9\u2665\033[39m",'9','H'},
+        {"\033[31mX\u2665\033[39m",'X','H'},
+        {"\033[31mJ\u2665\033[39m",'J','H'},
+        {"\033[31mQ\u2665\033[39m",'Q','H'},
+        {"\033[31mK\u2665\033[39m",'Y','H'},
+        {"\033[31mjR\033[39m",'j','R'},
+        {"\033[35mjB\033[39m",'j','B'}
     };
 
     deck dungeon;
-	card playing[4];
+    int diff = 0;
+    bool cleared = false;
+    int missing = 4;
 	bool empty[4]={0,0,0,0};
 	int difficulty;
+	int hp = 20;
+
+	deck playing;
+    initDeck(playing);
     initDeck(dungeon);
 	fillDeck(dungeon, donsoldeck, 54);
     deckShuffle(dungeon);
 
 	while (1) {
 dondiffin:
+    // difficulty selection
 		switch (getkey()){
-			case '1':
-			case '2':
-			case '3':
+			case '1': diff = 0; break;
+			case '2': diff = 1; break;
+			case '3': diff = 2; break;
+			case 'q': printf("exiting...\n"); return;
 			default: goto dondiffin;
 		}
+	}
+	// the actual game
+	while (dungeon.count > 0 && hp > 0) {
+	    if (playing.count <= 1) {
+			while (playing.count < 4) {
+			    deckAppend(playing, dungeon.items[dungeon.start]);
+				dungeon.start++;
+				dungeon.count--;
+			}
 
-	    return;
+		}
+donsolin:
+        // play the actual game
+		switch (getkey()) {
+		    case '1':
+			case '2':
+			case '3':
+			case '4':
+			case 'e':
+			    // easy: all monsters dead or previous room fully cleared
+				// medium: previous room fully cleared
+				// hard: all monsters dead
+				switch (diff) {
+                    case 0:
+                    case 1:
+                    case 2:
+                    default: printf("difficulty error\n"); break;
+				}
+			    break;
+			case 'q': printf("quitting\n"); return; break;
+			default: goto donsolin;
+		}
+	}
+	// results:
+	if (hp <= 0) {
+	    printf("you lost\n");
+	}
+	else {
+	    printf("you won\n");
 	}
 }
 
@@ -496,31 +544,24 @@ bool regiDmgCheck (deck dec, bool held[], int atk){
 
 #define getUsedCards(D,H) ({int retval=0; for (int i=0;i<D.count;i++){if(H[i]){retval++;};}; retval;});
 
-#define regiPrint(X,Y,Z)\
-    do {\
-        printf("\nTavern\n");\
-        for (int i=0;i<X.count;i++){\
-            printf("%s ",X.items[i+X.start].name);\
-            if (i%10==9){\
-                printf("\n");\
-            }\
-        }\
-        printf("\nDiscard\n");\
-        for (int i=0;i<Y.count;i++){\
-            printf("%s ",Y.items[i+Y.start].name);\
-            if (i%10==9){\
-                printf("\n");\
-            }\
-        }\
-        printf("\nCastle\n");\
-        for (int i=0;i<Z.count;i++){\
-            printf("%s ",Z.items[i+Z.start].name);\
-            if (i%10==9){\
-                printf("\n");\
-            }\
-        }\
-        printf("\n");\
-    } while(0);
+void printDeck(deck D) {
+    for (int h=0;h<D.count;h++){\
+        printf("%s ",D.items[h+D.start].name);
+        if(h%10==9){
+            printf("\n");
+        }
+    }
+}
+
+void regiPrint(deck X,deck Y,deck Z){
+        printf("\nTavern\n");
+        printDeck(X);
+        printf("\nDiscard\n");
+        printDeck(Y);
+        printf("\nCastle\n");
+        printDeck(Z);
+        printf("\n");
+}
 
 void regicide() {
     card regipldeck[40] = {
@@ -717,7 +758,7 @@ regs1in:
                     break;
                 case '\r': confirm = true; break;
                 case '\n': confirm = true; break;
-                case 'q': goto noplayreg;
+                case 'q': printf("quitting...\n"); return;
 				default: goto regs1in;
             }
         }
@@ -873,7 +914,7 @@ regs2in:
                     break;
                 case '\r': confirm = true; break;
                 case '\n': confirm = true; break;
-                case 'q': goto noplayreg;
+                case 'q': printf("quitting...\n"); return;
                 default:
                     goto regs2in;
 			}
@@ -981,15 +1022,10 @@ input:
                 printf("\nTurn order:\n\n   1. Player plays a card.\n   2. Player activates avaliable suit powers.\n");
                 printf("   3. Player deals damage to the enemy.\n   4. Player suffers damage from the enemy, if the enemy isn't defated.\n\n");
 				break;
-			case 'q':
-				gamerunning = false;
-				goto leave;
+			case 'q': gamerunning = false; printf("byebye\n"); return 0;
 			default:
 				goto input;
 		}
 		goback();
 	}
-leave:
-	printf("byebye\n");
-	return 0;
 }
