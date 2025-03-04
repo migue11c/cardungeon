@@ -347,6 +347,22 @@ void scoundrel() {
 	}
 }
 
+// no return value but removes n-th element of the deck and moves the rest of it backwards
+#define stripDeck(D,n)\
+    do {\
+        while(n<D.count-1){\
+            D.items[n] = D.items[n+1];\
+            n++;\
+        }\
+        D.count--;\
+    } while(0);
+
+void checkRoom(deck dec){
+    for (int i=0;i<dec.count;i++){
+
+    }
+}
+
 #define organizeDeck(D)\
     do {\
         if(D.count > 0){\
@@ -423,6 +439,7 @@ void donsol() {
     bool cleared = false;
 	bool new = true;
     int missing = 4;
+    int held=0;
 	bool empty[4]={0,0,0,0};
 	int difficulty;
 	int hp = 20;
@@ -467,10 +484,10 @@ dondiffin:
 donsolin:
         // play the actual game
 		switch (getkey()) {
-		    case '1': // marks 1st card as held
-			case '2': // marks 2nd card as held
-			case '3': // marks 3rd card as held
-			case '4': // marks 4tth card as held
+		    case '1': if(!empty[0]){held=1;break;} else goto donsolin;
+			case '2': if(!empty[1]){held=2;break;} else goto donsolin;
+			case '3': if(!empty[2]){held=3;break;} else goto donsolin;
+			case '4': if(!empty[3]){held=4;break;} else goto donsolin;
 			case 'e': // skips the stage if condition is fulfilled
 			    // easy: all monsters dead or previous room fully cleared
 				// medium: previous room fully cleared
@@ -495,6 +512,11 @@ donsolin:
 			case 'q': printf("quitting\n"); return; break;
 			default: goto donsolin;
 		}
+		// gets the held item and resets it to 0
+		// reads the value and suit and does things according to it
+		// hearts heal hp (once per room)
+		// diamonds add shield (will negate if enemy has lower value than the last enemy defeated with negation)
+		// spades and clubs are enemies
 	}
 	// results:
 	if (hp <= 0) {
