@@ -14,7 +14,10 @@
 	#include <unistd.h>
 #endif
 
-#define _DEBUG
+void debug(){
+	// doesnt actually do shit
+	#define _DEBUG
+};
 
 // needs to either be reformatted into one deck, called upon the start of the game or will stay like this for each new game added
 // will also be really nice to add ANSI to each card
@@ -139,6 +142,17 @@ int getValue(char rank, char game){
         };\
     } while(0);
 
+
+void printDeck(deck D, int a) {
+    if (a == 0) a=D.count;
+	for (int h=0;h<a;h++){
+        printf("%s ",D.items[h+D.start].name);
+        if(h%10==9){
+            printf("\n");
+        }
+    }
+}
+
 // \u2663 clubs
 // \u2660 spades
 // \u2666 diamonds
@@ -240,10 +254,6 @@ char getkey() {
 		return ch;
 	#endif
 }
-
-void debug(){
-
-};
 
 void goback(){ // returns to the menu screen
     printf("\033[36mPress any key to go back...\033[0m");
@@ -382,6 +392,7 @@ void donsol() {
     deck dungeon;
     int diff = 0;
     bool cleared = false;
+	bool new = true;
     int missing = 4;
 	bool empty[4]={0,0,0,0};
 	int difficulty;
@@ -393,20 +404,25 @@ void donsol() {
 	fillDeck(dungeon, donsoldeck, 54);
     deckShuffle(dungeon);
 
-	while (1) {
+	// setting up
+	while (playing.count < 4) {
+		deckAppend(playing, dungeon.items[dungeon.start]);
+		dungeon.start++;
+		dungeon.count--;
+	}
+
 dondiffin:
     // difficulty selection
-		switch (getkey()){
-			case '1': diff = 0; break;
-			case '2': diff = 1; break;
-			case '3': diff = 2; break;
-			case 'q': printf("exiting...\n"); return;
-			default: goto dondiffin;
-		}
+	switch (getkey()){
+		case '1': diff = 0; break;
+		case '2': diff = 1; break;
+		case '3': diff = 2; break;
+		case 'q': printf("exiting...\n"); return;
+		default: goto dondiffin;
 	}
 	// the actual game
 	while (dungeon.count > 0 && hp > 0) {
-	    if (playing.count <= 1) {
+	    if (new) {
 			while (playing.count < 4) {
 			    deckAppend(playing, dungeon.items[dungeon.start]);
 				dungeon.start++;
@@ -427,8 +443,18 @@ donsolin:
 				// hard: all monsters dead
 				switch (diff) {
                     case 0:
+						if (cleared) { // or dead monsters
+							// append to back of dungeon
+						} else goto donsolin;
+						break;
                     case 1:
+						if (cleared) {
+							// append
+						}
                     case 2:
+						if (0) {
+							// append
+						}
                     default: printf("difficulty error\n"); break;
 				}
 			    break;
@@ -443,6 +469,8 @@ donsolin:
 	else {
 	    printf("you won\n");
 	}
+	clearDeck(dungeon);
+	clearDeck(playing);
 }
 
 typedef struct{
@@ -543,25 +571,6 @@ bool regiDmgCheck (deck dec, bool held[], int atk){
 #define getRegiValue(D,H) ({int retval=0; for (int i=0;i<D.count;i++){if(H[i]){retval+=getValue(D.items[i].value,'r');};}; retval;});
 
 #define getUsedCards(D,H) ({int retval=0; for (int i=0;i<D.count;i++){if(H[i]){retval++;};}; retval;});
-
-void printDeck(deck D) {
-    for (int h=0;h<D.count;h++){\
-        printf("%s ",D.items[h+D.start].name);
-        if(h%10==9){
-            printf("\n");
-        }
-    }
-}
-
-void regiPrint(deck X,deck Y,deck Z){
-        printf("\nTavern\n");
-        printDeck(X);
-        printf("\nDiscard\n");
-        printDeck(Y);
-        printf("\nCastle\n");
-        printDeck(Z);
-        printf("\n");
-}
 
 void regicide() {
     card regipldeck[40] = {
@@ -685,7 +694,13 @@ regs1:
             printf("\n");
             // needs to display enemy, atk, hp and your hand along with selected cards
             #ifdef _DEBUG
-            regiPrint(tavern, discard, castle);
+        	printf("\nTavern\n");
+        	printDeck(tavern, 0);
+        	printf("\nDiscard\n");
+        	printDeck(discard, 0);
+        	printf("\nCastle\n");
+        	printDeck(castle, 0);
+        	printf("\n");
             #endif
             printf("\n Enemy:%s(%d)  HP:%d  ATK:%d\n\n Hand:%d | Tavern:%lu | Discard:%lu | Jokers:%d\n",en.enemy.name, enemy, en.hp, en.atk, 8-missing, (unsigned long)tavern.count, (unsigned long)discard.count, jokers);
             printf(" \u250F\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2513\n");
@@ -866,7 +881,13 @@ regs2:
 		    printf("\n ---------------------------------------------------------------\n\n Defend!\n");
             // needs to display enemy, atk, hp and your hand along with selected cards
             #ifdef _DEBUG
-            regiPrint(tavern, discard, castle);
+        	printf("\nTavern\n");
+        	printDeck(tavern, 0);
+        	printf("\nDiscard\n");
+        	printDeck(discard, 0);
+        	printf("\nCastle\n");
+        	printDeck(castle, 0);
+        	printf("\n");
             #endif
             printf("\n Enemy:%s(%d)  HP:%d  ATK:%d\n\n Hand:%d | Tavern:%lu | Discard:%lu | Jokers:%d\n",en.enemy.name, enemy, en.hp, en.atk, 8-missing, (unsigned long)tavern.count, (unsigned long)discard.count, jokers);
             printf(" \u250F\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2513\n");
