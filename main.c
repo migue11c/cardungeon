@@ -142,7 +142,18 @@ int getValue(char rank, char game){
         };\
     } while(0);
 
-
+void debugPrintDeck(deck D) { // prints the entire deck capacity
+	for (int h=0;h<D.capacity;h++){
+        if (D.items[h].name != NULL) {
+			printf("%d:%s ",h,D.items[h].name);
+        } else if(h>99){
+            printf(" %d:EM ",h);
+        } else printf("%d:EM ",h);
+        if(h%10==9){
+            printf("\n");
+        }
+    }
+}
 void printDeck(deck D, int a) {
     if (a == 0) a=D.count;
 	for (int h=0;h<a;h++){
@@ -331,6 +342,19 @@ void scoundrel() {
 	}
 }
 
+#define organizeDeck(D)\
+    do {\
+        if(D.count > 0){\
+            for(int elem; elem < D.capacity; elem++)\
+                D.items[elem] = D.items[D.start+elem];\
+            }\
+            D.start = 0;\
+            while (D.count <= D.capacity/2) {\
+                D.items = realloc(D.items, D.capacity*sizeof(*D.items));\
+            }\
+        }\
+    } while(0);
+
 void donsol() {
     card donsoldeck[54] = {
         {"\033[36mA\u2663\033[39m",'A','C'},
@@ -398,15 +422,15 @@ void donsol() {
 	int difficulty;
 	int hp = 20;
 
-	deck playing;
-    initDeck(playing);
+	deck room;
+    initDeck(room);
     initDeck(dungeon);
 	fillDeck(dungeon, donsoldeck, 54);
     deckShuffle(dungeon);
 
 	// setting up
-	while (playing.count < 4) {
-		deckAppend(playing, dungeon.items[dungeon.start]);
+	while (room.count < 4) {
+		deckAppend(room, dungeon.items[dungeon.start]);
 		dungeon.start++;
 		dungeon.count--;
 	}
@@ -423,21 +447,26 @@ dondiffin:
 	// the actual game
 	while (dungeon.count > 0 && hp > 0) {
 	    if (new) {
-			while (playing.count < 4) {
-			    deckAppend(playing, dungeon.items[dungeon.start]);
+			while (room.count < 4) {
+			    deckAppend(room, dungeon.items[dungeon.start]);
 				dungeon.start++;
 				dungeon.count--;
 			}
 
 		}
+		#ifdef _DEBUG
+		printDeck(dungeon, 0);
+		#endif
+		printf("\n\n");
+		printDeck(room, 0);
 donsolin:
         // play the actual game
 		switch (getkey()) {
-		    case '1':
-			case '2':
-			case '3':
-			case '4':
-			case 'e':
+		    case '1': // marks 1st card as held
+			case '2': // marks 2nd card as held
+			case '3': // marks 3rd card as held
+			case '4': // marks 4tth card as held
+			case 'e': // skips the stage if condition is fulfilled
 			    // easy: all monsters dead or previous room fully cleared
 				// medium: previous room fully cleared
 				// hard: all monsters dead
@@ -470,7 +499,7 @@ donsolin:
 	    printf("you won\n");
 	}
 	clearDeck(dungeon);
-	clearDeck(playing);
+	clearDeck(room);
 }
 
 typedef struct{
@@ -695,9 +724,13 @@ regs1:
             // needs to display enemy, atk, hp and your hand along with selected cards
             #ifdef _DEBUG
         	printf("\nTavern\n");
+            debugPrintDeck(tavern);
+            printf("\n");
         	printDeck(tavern, 0);
         	printf("\nDiscard\n");
-        	printDeck(discard, 0);
+            debugPrintDeck(discard);
+            printf("\n");
+           	printDeck(discard, 0);
         	printf("\nCastle\n");
         	printDeck(castle, 0);
         	printf("\n");
