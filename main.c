@@ -14,6 +14,11 @@
 	#include <unistd.h>
 #endif
 
+// todo:
+// fix duplicate cards being drawn in regicide
+// continue work on donsol logic
+// get to work on scoundrel
+
 void debug(){
 	// doesnt actually do shit
 	#define _DEBUG
@@ -684,8 +689,8 @@ void regicide() {
 	// draw hand of 8 (remove 8 from tavern)
 	for (int i = 0; i<8; i++){
 	    deckAppend(hand, drawLogic(tavern));
-		//tavern.start++;
-		//tavern.count--;
+		// tavern.start++;
+		// tavern.count--;
 	}
 
 	while (enemy < 12 && missing < 8) {
@@ -735,6 +740,9 @@ regs1:
         	printDeck(castle, 0);
         	printf("\n");
             #endif
+			for (int z=0;z<enemy;z++){
+				printf("%s ",castle.items[z].name);
+			}
             printf("\n Enemy:%s(%d)  HP:%d  ATK:%d\n\n Hand:%d | Tavern:%lu | Discard:%lu | Jokers:%d\n",en.enemy.name, enemy, en.hp, en.atk, 8-missing, (unsigned long)tavern.count, (unsigned long)discard.count, jokers);
             printf(" \u250F\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2513\n");
             printf(" \u2503");
@@ -922,6 +930,9 @@ regs2:
         	printDeck(castle, 0);
         	printf("\n");
             #endif
+			for (int z=0;z<enemy;z++){
+				printf("%s ",castle.items[z].name);
+			}
             printf("\n Enemy:%s(%d)  HP:%d  ATK:%d\n\n Hand:%d | Tavern:%lu | Discard:%lu | Jokers:%d\n",en.enemy.name, enemy, en.hp, en.atk, 8-missing, (unsigned long)tavern.count, (unsigned long)discard.count, jokers);
             printf(" \u250F\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2513\n");
             printf(" \u2503");
