@@ -248,34 +248,34 @@ void cardswap(card *a, card *b){ // this works cuz it's a pointer to a type?
 // shuffles the cards around
 
 char getkey() {
-  #ifdef _WIN32
-    // windows terminal input noecho
-    return _getch(); // maybe can just return _getch() instead?
-  #else
-    // linux terminal inout noecho
-    struct termios oldt, newt;
-    char ch;
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO); // flag for disabling echo
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt); // disables echo
-    ch = getchar();
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // enables echo
-    return ch;
-  #endif
+#ifdef _WIN32
+  // windows terminal input noecho
+  return _getch(); // maybe can just return _getch() instead?
+#else
+  // linux terminal inout noecho
+  struct termios oldt, newt;
+  char ch;
+  tcgetattr(STDIN_FILENO, &oldt);
+  newt = oldt;
+  newt.c_lflag &= ~(ICANON | ECHO); // flag for disabling echo
+  tcsetattr(STDIN_FILENO, TCSANOW, &newt); // disables echo
+  ch = getchar();
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // enables echo
+  return ch;
+#endif
 }
 
 void goback(){ // returns to the menu screen
   printf("\033[36mPress any key to go back...\033[0m");
-    getkey();
-    printf("\n");
+  getkey();
+  printf("\n");
 }
 
 void menu(){
-	printf("\nWelcome to cardungeon!\nPlease press one of the following keys:\nc: Basic controls\n");
-	printf("s: Play Scoundrel\nS: Scoundrel rules\nd: Play Donsol\nD: Donsol rules\nr: Play Regicide\nR: Regicide rules\nx: Stats\nq: Quit\n");
-	// ANSI escape codes do underline and red color
-	// 0m resets the text formatting
+  printf("\nWelcome to cardungeon!\nPlease press one of the following keys:\nc: Basic controls\n");
+  printf("s: Play Scoundrel\nS: Scoundrel rules\nd: Play Donsol\nD: Donsol rules\nr: Play Regicide\nR: Regicide rules\nx: Stats\nq: Quit\n");
+  // ANSI escape codes do underline and red color
+  // 0m resets the text formatting
 }
 
 void scoundrel() {
