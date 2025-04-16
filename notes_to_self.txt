@@ -1,1 +1,2 @@
 1. use printf("%lu",(unsigned long)value); if the value is size_t type.
+2. learn printf, it's its' own lang

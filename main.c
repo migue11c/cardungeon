@@ -14,8 +14,8 @@
 #endif
 
 void debug(){
-	// doesnt actually do shit
-	#define _DEBUG
+  // doesnt actually do shit
+#define _DEBUG
 };
 
 // needs to either be reformatted into one deck, called upon the start of the game or will stay like this for each new game added
@@ -328,13 +328,13 @@ void scoundrel() {
   deck dungeon;
   initDeck(dungeon);
 
-	// shuffle deck
-	//
-	// turn order:
-	// 1: deal hand based on missing cards
-	// 2: discard or play 3 cards
-	//     2.1: cannot discard if last play was a discard, can only discard at the start of the turn
-	//     2.5: if discarded, shuffle hand and append to end of deck array
+  // shuffle deck
+  //
+  // turn order:
+  // 1: deal hand based on missing cards
+  // 2: discard or play 3 cards
+  //     2.1: cannot discard if last play was a discard, can only discard at the start of the turn
+  //     2.5: if discarded, shuffle hand and append to end of deck array
 
   while (1) {
     return;
@@ -472,22 +472,22 @@ dondiffin:
       }
     }
 #ifdef _DEBUG
-  printDeck(dungeon, 0);
+    printDeck(dungeon, 0);
 #endif
-  printf("\n\n");
-  printDeck(room, 0);
+    printf("\n\n");
+    printDeck(room, 0);
 donsolin:
   // play the actual game
-  switch (getkey()) {
-    case '1': if(!empty[0]){held=1;break;} else goto donsolin;
-    case '2': if(!empty[1]){held=2;break;} else goto donsolin;
-    case '3': if(!empty[2]){held=3;break;} else goto donsolin;
-    case '4': if(!empty[3]){held=4;break;} else goto donsolin;
-    case 'e': // skips the stage if condition is fulfilled
+    switch (getkey()) {
+      case '1': if(!empty[0]){held=1;break;} else goto donsolin;
+      case '2': if(!empty[1]){held=2;break;} else goto donsolin;
+      case '3': if(!empty[2]){held=3;break;} else goto donsolin;
+      case '4': if(!empty[3]){held=4;break;} else goto donsolin;
+      case 'e': // skips the stage if condition is fulfilled
       // easy: all monsters dead or previous room fully cleared
       // medium: previous room fully cleared
       // hard: all monsters dead
-      switch (diff) {
+	switch (diff) {
           case 0:
 	    if (cleared) { // or dead monsters
 	      // append to back of dungeon
