@@ -1,2 +1,13 @@
 1. use printf("%lu",(unsigned long)value); if the value is size_t type.
 2. learn printf, it's its' own lang
+3. when shifting elements, use memmove
+
+
+regicide
+tavern has 40 cards, but goes up to 52.
+init 64 elements, offset by a few (10 should be enough).
+when count+start == 64, you can just memmove the array backwards
+
+memmove(&arr[newStart],&arr[oldStart],count*sizeof(arrayItem))
+
+

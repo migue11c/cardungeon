@@ -99,7 +99,7 @@ int getValue(char rank, char game){
   } while(0)
 
 // all of these need to be macros
-
+// 10 is offset of the deck, in case things get appended in front
 #define initDeck(T)\
   do {\
     T.count = 0;\
@@ -108,13 +108,33 @@ int getValue(char rank, char game){
     T.items = malloc(T.capacity*sizeof(*T.items));\
   } while(0);
 
+// for some reason these shenanitans dont work
+#define arrangeDeck(Z)\
+  do {\
+    memmove(&Z.items[8], &Z.items[Z.start], Z.count*sizeof(*Z.items));\
+    Z.start=8;\
+  } while(0);
+
+// these 2 are not needed
+#define enlargeDeck(Z)\
+  do {\
+    Z.capacity *= 2;\
+    Z.items = realloc(Z.items, Z.capacity*sizeof(*Z.items))\
+  } while(0);
+
+// this whole system needs a rewrite
+#define deckThinner(Z)\
+  do {\
+    Z.capacity /=2;\
+    Z.items = realloc(Z.items, Z.capacity*sizeof(*Z.items));\
+  } while(0);
+
 // trims the deck from behind, memory can still be accessed for leftover cards but it will be changed after appending.
 // no need to set the value to null when we have array size
 #define deckTrim(T)\
   do {\
-    if (--T.count+T.start == (T.capacity/2)-1 && T.count+T.start > 64) {\
-    T.capacity /= 2;\
-    T.items = realloc(T.items, T.capacity*sizeof(*T.items));\
+    if (0<T.count--){\
+      T.start++;\
     }\
   } while(0);
 
@@ -123,21 +143,24 @@ int getValue(char rank, char game){
 //     // cause a memory leak michael
 // }
 
+
+// appends and enlarges deck
 #define deckAppend(T, I)\
   do {\
     if (T.count+T.start >= T.capacity) {\
-      if (T.capacity == 0) T.capacity = 64;\
-      T.capacity *= 2;\
-      T.items = realloc(T.items, T.capacity*sizeof(*T.items));\
+      arrangeDeck(T)\
     }\
     T.items[T.start+T.count++] = I;\
   } while(0);
 
+// snippet in case of failure
+      //T.capacity *= 2;\
+      T.items = realloc(T.items, T.capacity*sizeof(*T.items));
 
 #define fillDeck(T, A, S)\
   do {\
     for (int i = 0; i<S; i++){\
-        deckAppend(T,A[i]);\
+      deckAppend(T,A[i]);\
     };\
   } while(0);
 
@@ -344,10 +367,7 @@ void scoundrel() {
 // no return value but removes n-th element of the deck and moves the rest of it backwards
 #define stripDeck(D,n)\
   do {\
-    while(n<D.count-1){\
-      D.items[n] = D.items[n+1];\
-      n++;\
-    }\
+    memmove(&D.items[n+1],&D.items[n],(D.count-n)*sizeot(*D.items));\
     D.count--;\
   } while(0);
 
@@ -1024,6 +1044,7 @@ regs2in:
 noplayreg:
   if (missing >= 8){
     printf("\nyou lose\n");
+    // for some reason ir you lose (and not press q) you get castle memory inside discard alloc. This does not affect it due to the size of discard being 0 initially.
   }
   else {
     printf("\nkilled everyone congrats\n");
