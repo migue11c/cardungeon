@@ -178,7 +178,6 @@ void deckFill(deck *tgt, const card *array, const unsigned int length) {
 // NOTE: This needs cardswap() to be tested properly if decided on bitwise.
 
 void deckShuffle(deck *tgt) {
-  srand(time(NULL));
   for (int i=tgt->count-1; i>0; i--) {
     int j=rand()%(i+1);
     cardswap(&tgt->items[tgt->start+i], &tgt->items[tgt->start+j]);
@@ -205,7 +204,7 @@ void printDeck(const deck D, int num) {
   if (num == 0) num=D.count;
   for (int h=0;h<num;h++) {
     printf("%s ",D.items[h+D.start].name);
-    if (h%10==9) printf("\n");
+    if (h%16==15) printf("\n");
   }
 }
 
@@ -228,6 +227,55 @@ void menu() {
 // TODO: Logic for Scoundrel
 
 void scoundrel() {
+  card scoundeck[44] = {
+    {"\033[36mA\u2663\033[0m",'A','C'},
+    {"\033[36m2\u2663\033[0m",'2','C'},
+    {"\033[36m3\u2663\033[0m",'3','C'},
+    {"\033[36m4\u2663\033[0m",'4','C'},
+    {"\033[36m5\u2663\033[0m",'5','C'},
+    {"\033[36m6\u2663\033[0m",'6','C'},
+    {"\033[36m7\u2663\033[0m",'7','C'},
+    {"\033[36m8\u2663\033[0m",'8','C'},
+    {"\033[36m9\u2663\033[0m",'9','C'},
+    {"\033[36mX\u2663\033[0m",'X','C'},
+    {"\033[36mJ\u2663\033[0m",'J','C'},
+    {"\033[36mQ\u2663\033[0m",'Q','C'},
+    {"\033[36mK\u2663\033[0m",'K','C'},
+    {"\033[35mA\u2660\033[0m",'A','S'},
+    {"\033[35m2\u2660\033[0m",'2','S'},
+    {"\033[35m3\u2660\033[0m",'3','S'},
+    {"\033[35m4\u2660\033[0m",'4','S'},
+    {"\033[35m5\u2660\033[0m",'5','S'},
+    {"\033[35m6\u2660\033[0m",'6','S'},
+    {"\033[35m7\u2660\033[0m",'7','S'},
+    {"\033[35m8\u2660\033[0m",'8','S'},
+    {"\033[35m9\u2660\033[0m",'9','S'},
+    {"\033[35mX\u2660\033[0m",'X','S'},
+    {"\033[35mJ\u2660\033[0m",'J','S'},
+    {"\033[35mQ\u2660\033[0m",'Q','S'},
+    {"\033[35mK\u2660\033[0m",'K','S'},
+    {"\033[33m2\u2666\033[0m",'2','D'},
+    {"\033[33m3\u2666\033[0m",'3','D'},
+    {"\033[33m4\u2666\033[0m",'4','D'},
+    {"\033[33m5\u2666\033[0m",'5','D'},
+    {"\033[33m6\u2666\033[0m",'6','D'},
+    {"\033[33m7\u2666\033[0m",'7','D'},
+    {"\033[33m8\u2666\033[0m",'8','D'},
+    {"\033[33m9\u2666\033[0m",'9','D'},
+    {"\033[33mX\u2666\033[0m",'X','D'},
+    {"\033[31m2\u2665\033[0m",'2','H'},
+    {"\033[31m3\u2665\033[0m",'3','H'},
+    {"\033[31m4\u2665\033[0m",'4','H'},
+    {"\033[31m5\u2665\033[0m",'5','H'},
+    {"\033[31m6\u2665\033[0m",'6','H'},
+    {"\033[31m7\u2665\033[0m",'7','H'},
+    {"\033[31m8\u2665\033[0m",'8','H'},
+    {"\033[31m9\u2665\033[0m",'9','H'},
+    {"\033[31mX\u2665\033[0m",'X','H'}
+  };
+  deck dungeon;
+  initDeck(&dungeon);
+  clearDeck(&dungeon);
   goback();
   return;
 }
@@ -237,6 +285,55 @@ void scoundrel() {
 // TODO: Logic for Donsol
 
 void donsol() {
+  card scoundeck[44] = {
+    {"\033[36mA\u2663\033[0m",'A','C'},
+    {"\033[36m2\u2663\033[0m",'2','C'},
+    {"\033[36m3\u2663\033[0m",'3','C'},
+    {"\033[36m4\u2663\033[0m",'4','C'},
+    {"\033[36m5\u2663\033[0m",'5','C'},
+    {"\033[36m6\u2663\033[0m",'6','C'},
+    {"\033[36m7\u2663\033[0m",'7','C'},
+    {"\033[36m8\u2663\033[0m",'8','C'},
+    {"\033[36m9\u2663\033[0m",'9','C'},
+    {"\033[36mX\u2663\033[0m",'X','C'},
+    {"\033[36mJ\u2663\033[0m",'J','C'},
+    {"\033[36mQ\u2663\033[0m",'Q','C'},
+    {"\033[36mK\u2663\033[0m",'K','C'},
+    {"\033[35mA\u2660\033[0m",'A','S'},
+    {"\033[35m2\u2660\033[0m",'2','S'},
+    {"\033[35m3\u2660\033[0m",'3','S'},
+    {"\033[35m4\u2660\033[0m",'4','S'},
+    {"\033[35m5\u2660\033[0m",'5','S'},
+    {"\033[35m6\u2660\033[0m",'6','S'},
+    {"\033[35m7\u2660\033[0m",'7','S'},
+    {"\033[35m8\u2660\033[0m",'8','S'},
+    {"\033[35m9\u2660\033[0m",'9','S'},
+    {"\033[35mX\u2660\033[0m",'X','S'},
+    {"\033[35mJ\u2660\033[0m",'J','S'},
+    {"\033[35mQ\u2660\033[0m",'Q','S'},
+    {"\033[35mK\u2660\033[0m",'K','S'},
+    {"\033[33m2\u2666\033[0m",'2','D'},
+    {"\033[33m3\u2666\033[0m",'3','D'},
+    {"\033[33m4\u2666\033[0m",'4','D'},
+    {"\033[33m5\u2666\033[0m",'5','D'},
+    {"\033[33m6\u2666\033[0m",'6','D'},
+    {"\033[33m7\u2666\033[0m",'7','D'},
+    {"\033[33m8\u2666\033[0m",'8','D'},
+    {"\033[33m9\u2666\033[0m",'9','D'},
+    {"\033[33mX\u2666\033[0m",'X','D'},
+    {"\033[31m2\u2665\033[0m",'2','H'},
+    {"\033[31m3\u2665\033[0m",'3','H'},
+    {"\033[31m4\u2665\033[0m",'4','H'},
+    {"\033[31m5\u2665\033[0m",'5','H'},
+    {"\033[31m6\u2665\033[0m",'6','H'},
+    {"\033[31m7\u2665\033[0m",'7','H'},
+    {"\033[31m8\u2665\033[0m",'8','H'},
+    {"\033[31m9\u2665\033[0m",'9','H'},
+    {"\033[31mX\u2665\033[0m",'X','H'}
+  };
+  deck dungeon;
+  initDeck(&dungeon);
+  clearDeck(&dungeon);
   goback();
   return;
 }
@@ -246,11 +343,14 @@ void donsol() {
 // TODO: Rewrite for regicide using multiple functions
 
 typedef struct {
- 
+  card enemy;
+  int hp;
+  int atk;
 } regienemy;
 
 void regishuffle(deck *tgt) {
-  deck temp; temp.count=4; temp.capacity=4;
+  deck temp; temp.count=4; temp.capacity=4; temp.start=0;
+  // this instead of initDeck(temp);
   temp.items=malloc(4*sizeof(*temp.items));
   int iter=0;
   for (int i=0; i<tgt->count; i++) {
@@ -262,6 +362,30 @@ void regishuffle(deck *tgt) {
 	iter++;
       }
     }
+  }
+}
+
+void regiAddEnemy(bool *new, regienemy *en, const deck castle, const int num) {
+  if(new) {
+    en->enemy = castle.items[num+castle.start];
+    switch (en->enemy.value) {
+      case 'J':
+	en->hp = 20;
+	en->atk = 10;
+	break;
+      case 'Q':
+	en->hp = 30;
+	en->atk = 15;
+	break;
+      case 'K':
+	en->hp = 40;
+	en->atk = 20;
+	break;
+      default:
+	printf("invalid value\n");
+	break;
+    }
+    new = false;
   }
 }
 
@@ -322,6 +446,7 @@ void regicide() {
     {"\033[33mK\u2666\033[39m",'K','D'},
     {"\033[31mK\u2665\033[39m",'K','H'}
   };
+  srand(time(NULL)); // this does not need to be reinitialized
   deck castle, tavern, discard, hand;
   initDeck(&castle);
   initDeck(&tavern);
@@ -336,7 +461,7 @@ void regicide() {
   bool perfect = 0;
   int jokers = 2;
   regienemy en = {};
-  int enemy = 0;
+  int foes = 0;
   bool newen = 1;
   int missing = 0;
   int dmg = 0;
@@ -348,8 +473,22 @@ void regicide() {
   for (int i = 0; i<8; i++){
     deckAppend(&hand, deckTrim(&tavern));
   }
-  fullyPrintDeck(castle);
-  goback();
+
+  while (foes<12 && missing<8) {
+regstart:
+    regiAddEnemy(&newen,&en,castle,foes);
+    foes++;
+    printDeck(castle, foes);
+    newen=true;
+    printf("\n");
+    // TODO: instead of step 1 and step 3, do a flip switch between atk and def
+    // and merge it all into one function, then you can call it twice
+  }
+
+  clearDeck(&castle);
+  clearDeck(&tavern);
+  clearDeck(&discard);
+  clearDeck(&hand);
   return;
 }
 
