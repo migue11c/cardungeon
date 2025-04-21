@@ -389,6 +389,112 @@ void regiAddEnemy(bool *new, regienemy *en, const deck castle, const int num) {
   }
 }
 
+// error codes
+
+// 0 hand is fine
+// 1 combo with A has more than 2 cards
+// 2 matched combo without A or Regi has more than 10 value
+// 3 combo has unmatched cards
+// 4 no selected cards
+//
+// WARN: This logic needs to be checked.
+// Everything works fine but there needs to be some unit tests.
+
+int regiHandCheck(const deck hand, const bool held[]) {
+  int value,first,cardnum,temp;
+  value=0; first=0; cardnum=0;
+  bool containsA,matched,containsRegi;
+  containsA=false; matched=false; containsRegi=false;
+  for (int i=0; i<8; i++) {
+    if(held[i]) {
+      temp = getValue(hand.items[i].value, 'r');
+      if (temp==1) containsA=true;
+      if (temp>10) containsRegi=true;
+      switch (++cardnum) {
+	case 1: if (!containsA) first=temp; break;
+	case 2:
+	  if (!containsA) {
+	    matched = (temp==first);
+	    if (!matched) return 3;
+	  }
+	  break;
+	default:
+	  if (containsA) return 1;
+	  else if (matched) {
+	    matched = (temp==first);
+	    if(!matched) return 3;
+	  }
+	  break;
+      }
+      value+=temp;
+    }
+  }
+  if (!containsA && !containsRegi && value>10) return 2;
+  if (cardnum==0) return 4;
+  return 0;
+}
+
+// NOTE: This needs to be checked
+
+int getRegiDmg (const deck used, const bool held[]) {
+  int atk=0;
+  for (int i=0; i<8; i++) {
+    if (held[i]) atk+=getValue(used.items[i].value, 'r');
+  }
+  return atk;
+}
+
+// a bit redundant function for checking defensive state, just to type less
+
+bool regiDmgCheck (const deck used, const bool held[], const int atk) {
+  if (getRegiDmg(used, held) >= atk) return true;
+  else return false;
+}
+
+int getUsedCards (const bool held[]) {
+  int amt=0;
+  for (int i=0; i<8; i++) {if (held[i]) amt++;}
+  return amt;
+}
+
+void regiHandleInput(const bool empty[], bool held[]) {
+regs1in:
+  switch (getkey()) {
+    case '1':
+      if(empty[0]) goto regs1in;
+      held[0] = !held[0];
+      break;
+    case '2':
+      if(empty[1]) goto regs1in;
+      held[1] = !held[1];
+      break;
+    case '3':
+      if(empty[2]) goto regs1in;
+      held[2] = !held[2];
+      break;
+    case '4':
+      if(empty[3]) goto regs1in;
+      held[3] = !held[3];
+      break;
+    case '5':
+      if(empty[4]) goto regs1in;
+      held[4] = !held[4];
+      break;
+    case '6':
+      if(empty[5]) goto regs1in;
+      held[5] = !held[5];
+      break;
+    case '7':
+      if(empty[6]) goto regs1in;
+      held[6] = !held[6];
+      break;
+    case '8':
+      if(empty[7]) goto regs1in;
+      held[7] = !held[7];
+      break;
+  }
+}
+
 void regicide() {
   card regipldeck[40] = {
     {"\033[36mA\u2663\033[39m",'A','C'},
@@ -462,12 +568,13 @@ void regicide() {
   int jokers = 2;
   regienemy en = {};
   int foes = 0;
-  bool newen = 1;
+  bool newen = true;
   int missing = 0;
   int dmg = 0;
   bool held[8] = {0,0,0,0,0,0,0,0};
   bool empty[8] = {0,0,0,0,0,0,0,0};
   bool confirm = false;
+  bool suits[4] = {0,0,0,0};
   
   // draw hand of 8 (remove 8 from tavern)
   for (int i = 0; i<8; i++){
@@ -476,6 +583,8 @@ void regicide() {
 
   while (foes<12 && missing<8) {
 regstart:
+    // NOTE: STEP 0:
+    // this is only for testing
     regiAddEnemy(&newen,&en,castle,foes);
     foes++;
     printDeck(castle, foes);
@@ -483,6 +592,8 @@ regstart:
     printf("\n");
     // TODO: instead of step 1 and step 3, do a flip switch between atk and def
     // and merge it all into one function, then you can call it twice
+    
+
   }
 
   clearDeck(&castle);
