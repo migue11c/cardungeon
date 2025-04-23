@@ -592,7 +592,6 @@ regstart:
     printf("\n");
     // TODO: instead of step 1 and step 3, do a flip switch between atk and def
     // and merge it all into one function, then you can call it twice
-    
 
   }
 
@@ -666,7 +665,28 @@ regstart:
 
 void stats() {} // TODO: This system needs to get implemented.
 
+bool validKey(void f()) {
+  bool key;
+
+  return key;
+}
+
 int main() {
+#ifdef _WIN32
+  SetConsoleOutputCP(CP_UTF8);
+#endif
+  char ch;
+  bool gamerunning = true;
+  printf("\n\n\033[35;49m\u250F\u2501\u2501\u2501\u2513\n\u2503A  \u2503\n\u2503 \u2660 \u2503\n\u2503  A\u2503\n\u2517\u2501\u2501\u2501\u251b\033[0m\n\nThe ace of spades!\n");
+
+  while (gamerunning) {
+    menu();
+    // TODO: An input handling function that loops back (without a goto) and switches between diferent check states.
+    // Ex. Menu will have c,x,.,s,S,d,D,r,R,q as input
+    // Regicide will have 1,2,3,4,5,6,7,8,j,q,enter as input
+    // etc.
+  }
+  
   regicide();
   getkey();
   return 0;
